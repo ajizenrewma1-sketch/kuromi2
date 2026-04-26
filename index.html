@@ -122,11 +122,19 @@
             </div>
 
             <!-- Table Filter -->
-            <div class="flex justify-between items-center mb-4 px-2">
-                <h2 class="text-xl font-bold text-gray-700">รายการวันที่: <span id="currentFilterDateDisplay" class="text-pink-500">ทั้งหมด</span></h2>
-                <div class="flex space-x-2">
-                    <input type="date" id="filterDate" onchange="fetchData()" class="w-40 text-xs py-1">
-                    <button onclick="clearFilter()" class="text-xs text-gray-400 underline">แสดงทั้งหมด</button>
+            <div class="flex flex-col items-center mb-8 px-2 space-y-3">
+                <h2 class="text-2xl font-bold text-gray-700 flex flex-wrap items-center justify-center gap-3">
+                    <span>รายการวันที่:</span>
+                    <span id="currentFilterDateDisplay" class="text-pink-500">ทั้งหมด</span>
+                </h2>
+                
+                <div class="flex items-center space-x-3 bg-pink-50/50 p-2 rounded-2xl border border-pink-100">
+                    <label for="filterDate" class="text-xs font-bold text-pink-400 ml-2 uppercase">เลือกวันที่ดูข้อมูล:</label>
+                    <input type="date" id="filterDate" onchange="fetchData()" 
+                           class="w-48 text-base py-2 px-4 font-semibold text-gray-700 bg-white border-2 border-pink-200 rounded-xl focus:border-pink-400 focus:ring-0 transition-all cursor-pointer">
+                    <button onclick="clearFilter()" class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-pink-500 hover:bg-white rounded-xl transition-all underline decoration-dotted">
+                        แสดงทั้งหมด
+                    </button>
                 </div>
             </div>
 
