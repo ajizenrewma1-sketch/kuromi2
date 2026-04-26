@@ -68,20 +68,16 @@
                 </div>
             </div>
             
-            <div class="flex flex-col items-end space-y-2 mt-4 md:mt-0">
+           <div class="flex flex-col items-end space-y-2 mt-4 md:mt-0">
                 <div id="connectionStatus" class="px-4 py-2 bg-white/20 rounded-full text-white text-xs font-medium border border-white/10">
                     กำลังเชื่อมต่อ Cloud...
-                </div>
-                <div id="refreshTimer" class="px-4 py-1 bg-pink-500/30 rounded-full text-white text-[10px] font-bold border border-white/20 flex items-center">
-                    <span class="mr-1">🔄 อัปเดตใน:</span>
-                    <span id="countdown" class="inline-block w-4 text-center">20</span>s
-                </div>
-                <div id="storageIndicator" class="px-4 py-2 bg-black/10 rounded-full text-white text-[10px] flex items-center hidden">
+                </div> <div id="storageIndicator" class="px-4 py-2 bg-black/10 rounded-full text-white text-[10px] flex items-center hidden">
                     <span>พื้นที่ Cloud: <span id="storagePercentText">0.00%</span></span>
-                    <div class="storage-bar-bg ml-2"><div id="storageBar" class="storage-bar-fill"></div></div>
+                    <div class="storage-bar-bg ml-2">
+                        <div id="storageBar" class="storage-bar-fill"></div>
+                    </div>
                 </div>
             </div>
-        </div> 
         </div> <div class="custom-card p-6 md:p-8 rounded-b-[2.5rem]">
             <div id="entryForm" class="bg-pink-50/40 p-5 rounded-[2rem] border border-pink-100/60 mb-10">
                 <input type="hidden" id="editDocId" value="">
@@ -627,31 +623,15 @@
             worksheet.getColumn(7).width = 15;
 
 // เขียนไฟล์และดาวน์โหลด
-           const buffer = await workbook.xlsx.writeBuffer();
+          const buffer = await workbook.xlsx.writeBuffer();
             saveAs(new Blob([buffer]), `${subTitle}.xlsx`);
 
-        } // <--- ปีกกาตัวนี้สำคัญมาก ต้องมีเพื่อปิดฟังก์ชันส่งออก Excel
+        } // ปิดฟังก์ชัน exportToExcelAdvanced
 
-        // --- ระบบ Auto Refresh และ ตัวนับถอยหลัง ---
-        let timeLeft = 20;
-        const countdownElement = document.getElementById('countdown');
-
-        function startAutoRefresh() {
-            setInterval(() => {
-                timeLeft--;
-                if (timeLeft <= 0) {
-                    if (typeof fetchData === "function") fetchData(); 
-                    timeLeft = 20;
-                }
-                if (countdownElement) {
-                    countdownElement.innerText = timeLeft;
-                }
-            }, 1000); 
-        }
-
-        // --- ส่วนที่ต้องเพิ่ม: คำสั่งเริ่มทำงานทันทีเมื่อเปิดหน้าเว็บ ---
-        startAutoRefresh(); 
-
+        // --- เริ่มทำงานครั้งแรกเมื่อโหลดหน้าเว็บ ---
+        initAuth();  // เชื่อมต่อระบบ Cloud
+        fetchData(); // ดึงข้อมูลมาแสดงครั้งแรก
+        
     </script>
 </body>
 </html>
