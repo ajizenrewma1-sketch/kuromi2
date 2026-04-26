@@ -93,23 +93,32 @@
                         <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">วันที่</label>
                         <input type="date" id="dateInput" class="px-1">
                     </div>
-                    <div class="w-full sm:flex-1 lg:flex-[1.5]">
+                    <div class="w-full sm:flex-1 lg:flex-[1.2]">
                         <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">ชื่อ-นามสกุล</label>
                         <input type="text" id="nameInput" placeholder="ระบุชื่อ">
                     </div>
-                    <div class="w-full sm:flex-1 lg:flex-1">
+                    <div class="w-full sm:flex-1 lg:flex-[1.2]">
                         <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">รายละเอียด</label>
-                        <input type="text" id="reasonInput" placeholder="ระบุรายการเบิก">
-                    </div>
-                    <div class="w-full sm:w-auto lg:w-48">
-                        <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">ธนาคาร & ยอดเงิน</label>
-                        <div class="flex space-x-1">
-                            <select id="bankInput" class="w-20 px-1 text-xs font-bold">
-                                <option value="SCB">SCB</option>
-                                <option value="KBANK">KBANK</option>
+                        <div class="flex flex-col space-y-2">
+                            <select id="reasonInput" onchange="toggleOtherReason()" class="px-2">
+                                <option value="เบิกค่าส่งพัสดุ">เบิกค่าส่งพัสดุ</option>
+                                <option value="เบิกค่าประกัน COD">เบิกค่าประกัน COD</option>
+                                <option value="เบิกค่าแนะนำ">เบิกค่าแนะนำ</option>
+                                <option value="อื่นๆ">อื่นๆ</option>
                             </select>
-                            <input type="number" id="amountInput" placeholder="0.00" class="w-24 flex-none">
+                            <input type="text" id="otherReasonInput" placeholder="ระบุรายละเอียดอื่นๆ" class="hidden border-pink-300 bg-white">
                         </div>
+                    </div>
+                    <div class="w-full sm:w-28 lg:w-28">
+                        <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">ธนาคาร</label>
+                        <select id="bankInput" class="px-2">
+                            <option value="SCB">SCB</option>
+                            <option value="KBANK">KBANK</option>
+                        </select>
+                    </div>
+                    <div class="w-full sm:w-32 lg:w-32">
+                        <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">จำนวนเงิน</label>
+                        <input type="number" id="amountInput" placeholder="0.00">
                     </div>
                     <div class="w-full sm:w-28 lg:w-28">
                         <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">ผู้แจ้งเบิก</label>
@@ -290,6 +299,7 @@
         window.editEntry = editEntry;
         window.fetchData = fetchData;
         window.clearFilter = clearFilter;
+	window.toggleOtherReason = toggleOtherReason;
         window.openDailySummary = openDailySummary;
         window.openMonthlyReportPicker = openMonthlyReportPicker;
         window.closeMonthlyPicker = closeMonthlyPicker;
@@ -337,9 +347,22 @@
                 let data = [];
                 snapshot.forEach(doc => { data.push({ id: doc.id, ...doc.data() }); });
                 updateStorageUsage(data.length);
+                
                 let displayData = [...data];
-                if (filterDate) { displayData = displayData.filter(item => item.rawDate === filterDate); }
-                displayData.sort((a, b) => new Date(a.rawDate) - new Date(b.rawDate));
+                if (filterDate) { 
+                    displayData = displayData.filter(item => item.rawDate === filterDate); 
+                }
+
+                // --- ปรับการเรียงลำดับที่นี่ ---
+                displayData.sort((a, b) => {
+                    // 1. เรียงตามวันที่ (rawDate) จากน้อยไปมาก
+                    if (a.rawDate !== b.rawDate) {
+                        return new Date(a.rawDate) - new Date(b.rawDate);
+                    }
+                    // 2. ถ้าวันที่เดียวกัน ให้เรียงตามเวลาที่กดบันทึก (updatedAt) จากน้อยไปมาก
+                    return new Date(a.updatedAt) - new Date(b.updatedAt);
+                });
+
                 allEntries = data; 
                 renderTable(displayData);
             } catch (err) { console.error("Fetch error", err); } finally {
@@ -400,10 +423,23 @@
             const status = document.getElementById('statusInput').value;
             const rawDate = document.getElementById('dateInput').value;
             const name = document.getElementById('nameInput').value;
-            const reason = document.getElementById('reasonInput').value;
             const bank = document.getElementById('bankInput').value;
             const amount = parseFloat(document.getElementById('amountInput').value) || 0;
             const requester = document.getElementById('requesterInput').value || '-';
+
+            // --- ส่วนที่ปรับปรุงใหม่ ---
+            let reason = document.getElementById('reasonInput').value;
+            const otherReason = document.getElementById('otherReasonInput').value;
+            
+            // หากเลือก "อื่นๆ" ให้ใช้ค่าจากช่องกรอกเพิ่มแทน
+            if (reason === 'อื่นๆ') {
+                if (!otherReason) {
+                    alert("กรุณาระบุรายละเอียดอื่นๆ");
+                    return;
+                }
+                reason = otherReason;
+            }
+            // -----------------------
 
             if (!name || !reason || amount <= 0 || !rawDate) {
                 alert("กรุณากรอกข้อมูลให้ครบถ้วน");
@@ -442,19 +478,34 @@
             document.getElementById('submitBtn').classList.add('btn-update');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+	function toggleOtherReason() {
+            const reasonSelect = document.getElementById('reasonInput');
+            const otherInput = document.getElementById('otherReasonInput');
+            if (reasonSelect && otherInput) {
+                if (reasonSelect.value === 'อื่นๆ') {
+                    otherInput.classList.remove('hidden');
+                    otherInput.focus();
+                } else {
+                    otherInput.classList.add('hidden');
+                    otherInput.value = '';
+                }
+            }
+        }
 
+        // ปรับปรุงฟังก์ชันล้างค่าเดิม (Update cancelEdit)
         function cancelEdit() {
             document.getElementById('editDocId').value = "";
             document.getElementById('submitBtn').innerText = 'บันทึก';
             document.getElementById('submitBtn').classList.remove('btn-update');
             document.getElementById('nameInput').value = '';
-            document.getElementById('reasonInput').value = '';
+            document.getElementById('reasonInput').value = 'เบิกค่าส่งพัสดุ'; // กลับไปค่าเริ่มต้น
+            document.getElementById('otherReasonInput').value = '';
+            document.getElementById('otherReasonInput').classList.add('hidden');
             document.getElementById('amountInput').value = '';
             document.getElementById('requesterInput').value = '';
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('dateInput').value = today;
         }
-
         function clearFilter() { document.getElementById('filterDate').value = ''; fetchData(); }
 
         function openDailySummary() {
@@ -512,9 +563,18 @@
                 const d = new Date(item.rawDate);
                 return (d.getMonth() + 1 === m && d.getFullYear() === y);
             });
-            mData.sort((a, b) => new Date(a.rawDate) - new Date(b.rawDate));
+
+            // --- ปรับการเรียงลำดับที่นี่ ---
+            mData.sort((a, b) => {
+                if (a.rawDate !== b.rawDate) {
+                    return new Date(a.rawDate) - new Date(b.rawDate);
+                }
+                return new Date(a.updatedAt) - new Date(b.updatedAt);
+            });
+
             const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-            closeMonthlyPickerDirect(); populateModal(mData, `รายงานประจำเดือน ${months[m-1]} ${y + 543}`);
+            closeMonthlyPickerDirect(); 
+            populateModal(mData, `รายงานประจำเดือน ${months[m-1]} ${y + 543}`);
         }
 
         function closeModal(e) { if (e.target.id === 'reportModal') closeModalDirect(); }
