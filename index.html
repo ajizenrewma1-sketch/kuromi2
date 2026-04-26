@@ -258,17 +258,27 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, addDoc, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Configuration
-        const firebaseConfig = JSON.parse(__firebase_config);
+        // 1. Firebase Configuration (ใส่ค่าของคุณ)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDYaBSsLtSIE-gIfUKXssh_y4xS5M18vH4",
+            authDomain: "swp-venture-cloud.firebaseapp.com",
+            projectId: "swp-venture-cloud",
+            storageBucket: "swp-venture-cloud.firebasestorage.app",
+            messagingSenderId: "395374134249",
+            appId: "1:395374134249:web:d4d98ecf34ae70d3104178",
+            measurementId: "G-NEF8XYF3GB"
+        };
+
+        // 2. ต้องมีบรรทัดพวกนี้เพื่อให้คำสั่ง Firebase ทำงานได้ (ห้ามลืมเด็ดขาด)
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'swp-venture-tracker';
+        const appId = 'swp-venture-tracker'; // ชื่อโฟลเดอร์เก็บข้อมูลในฐานข้อมูล
         
         let user = null;
         let allEntries = [];
 
-        // Global functions
+        // 3. Global functions (คงไว้เหมือนเดิม)
         window.saveToCloud = saveToCloud;
         window.deleteEntry = deleteEntry;
         window.editEntry = editEntry;
@@ -283,7 +293,7 @@
         window.closeModalDirect = closeModalDirect;
         window.exportToExcelAdvanced = exportToExcelAdvanced;
 
-        // Init Auth
+        // 4. การจัดการระบบล็อคอิน
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -304,6 +314,7 @@
                 fetchData();
             }
         });
+
         initAuth();
 
         async function fetchData() {
