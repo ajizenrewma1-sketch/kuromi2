@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบเบิกเงินสำรองจ่าย SWP Edition</title>
+    <title>ระบบเบิกเงินสำรองจ่าย SWP Venture</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -33,10 +33,12 @@
             font-size: 1rem;
             padding: 1.25rem 1rem;
             letter-spacing: 0.5px;
+            text-align: center;
         }
         .header-scb { color: #d81b60 !important; }
         .header-kbank { color: #2e6b36 !important; }
 
+        /* ปรับให้ตัวอักษรในช่องกรอกอยู่ตรงกลาง */
         input, select {
             border: 1px solid #fce4ec;
             padding: 10px 12px;
@@ -47,12 +49,20 @@
             transition: all 0.3s ease;
             font-family: 'IBM Plex Sans Thai', sans-serif;
             font-size: 0.875rem;
+            text-align: center; /* จัดตัวอักษรกึ่งกลาง */
+            text-align-last: center; /* สำหรับ select ในบางเบราว์เซอร์ */
         }
         input:focus, select:focus {
             outline: none;
             border-color: #ff85b3;
             box-shadow: 0 0 0 4px rgba(255, 133, 179, 0.15);
         }
+        
+        /* ปรับสไตล์ปฏิทินให้แสดงกึ่งกลาง */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            margin-left: -15px;
+        }
+
         .btn-add {
             background: linear-gradient(to right, #ff85b3, #9d65ff);
             color: white;
@@ -137,10 +147,6 @@
             font-weight: 500;
             transition: all 0.3s ease;
         }
-        .btn-summary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
     </style>
 </head>
 <body class="p-4 md:p-10">
@@ -156,87 +162,62 @@
                         <circle cx="40" cy="55" r="3" fill="#444" />
                         <circle cx="60" cy="55" r="3" fill="#444" />
                         <ellipse cx="50" cy="62" rx="4" ry="2" fill="#ffb74d" />
-                        <path d="M20 30 L30 40 M22 35 L32 45" stroke="#ff85b3" stroke-width="2" />
                     </svg>
                     <svg class="char-icon w-16 h-16" viewBox="0 0 100 100">
                         <circle cx="50" cy="55" r="35" fill="white" />
                         <path d="M15 45 Q10 5 45 35 L50 45 L55 35 Q90 5 85 45" fill="#9d65ff" />
                         <circle cx="50" cy="25" r="6" fill="#ff4081" />
-                        <path d="M48 23 L52 27 M52 23 L48 27" stroke="white" stroke-width="1.5" />
-                        <path d="M35 55 Q40 50 45 55" fill="none" stroke="#444" stroke-width="2" />
-                        <path d="M55 55 Q60 50 65 55" fill="none" stroke="#444" stroke-width="2" />
-                        <ellipse cx="50" cy="62" rx="3" ry="1.5" fill="#444" />
                     </svg>
                 </div>
                 <div>
                     <h1 class="text-3xl font-bold text-white drop-shadow-md">ตารางเบิกเงิน</h1>
-                    <p class="text-white/90 font-medium tracking-wide italic">สำรองจ่ายรายวัน วันที่ <span id="header-date"></span> SWP</p>
+                    <p class="text-white/90 font-medium tracking-wide italic">สำรองจ่ายรายวัน วันที่ <span id="header-date"></span> SWP Venture</p>
                 </div>
             </div>
         </div>
 
         <!-- Main Card -->
         <div class="custom-card p-6 md:p-8 rounded-b-[2.5rem]">
-            <!-- Form Area - Compact Single Row -->
+            <!-- Form Area -->
             <div id="entryForm" class="bg-pink-50/40 p-5 rounded-[2rem] border border-pink-100/60 mb-10">
                 <input type="hidden" id="editIndex" value="-1">
                 <div class="flex flex-wrap lg:flex-nowrap gap-3 items-end">
                     <div class="w-full sm:w-[calc(50%-0.75rem)] lg:w-32">
-                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1">สถานะ</label>
-                        <select id="statusInput" onchange="this.className = 'text-sm ' + (this.value === 'รออนุมัติ' ? 'status-pending' : 'status-approved')">
-                            <option value="รออนุมัติ" class="status-pending">🔴 รออนุมัติ</option>
-                            <option value="อนุมัติ" class="status-approved">🟢 อนุมัติ</option>
+                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1 text-center">สถานะ</label>
+                        <select id="statusInput" onchange="this.className = 'status-pending' + (this.value === 'อนุมัติ' ? ' status-approved' : ' status-pending')">
+                            <option value="รออนุมัติ">🔴 รออนุมัติ</option>
+                            <option value="อนุมัติ">🟢 อนุมัติ</option>
                         </select>
                     </div>
                     <div class="w-full sm:w-[calc(50%-0.75rem)] lg:w-40">
-                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1">วันที่</label>
+                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1 text-center">วันที่</label>
                         <input type="date" id="dateInput">
                     </div>
                     <div class="w-full sm:w-[calc(50%-0.75rem)] lg:flex-1">
-                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1">ชื่อ-นามสกุล (ผู้รับเงิน)</label>
+                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1 text-center">ชื่อ-นามสกุล (ผู้รับเงิน)</label>
                         <input type="text" id="nameInput" placeholder="ผู้รับเงิน">
                     </div>
                     <div class="w-full sm:w-[calc(50%-0.75rem)] lg:flex-1">
-                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1">รายละเอียด</label>
+                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1 text-center">รายละเอียด</label>
                         <input type="text" id="reasonInput" placeholder="ระบุข้อมูลการเบิก">
                     </div>
-                    <div class="w-full sm:w-[calc(60%-0.75rem)] lg:w-60">
-                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1">ธนาคาร & ยอดเงิน</label>
+                    <div class="w-full sm:w-[calc(60%-0.75rem)] lg:w-72">
+                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1 text-center">ธนาคาร & ยอดเงิน</label>
                         <div class="flex space-x-1">
-                            <select id="bankInput" class="w-[45%]">
-                                <option value="SCB">SCB</option>
-                                <option value="KBANK">KBANK</option>
+                            <select id="bankInput" class="w-[55%]">
+                                <option value="SCB">ธนาคารไทยพาณิชย์</option>
+                                <option value="KBANK">ธนาคารกสิกรไทย</option>
                             </select>
-                            <input type="number" id="amountInput" placeholder="0.00" class="w-[55%]">
+                            <input type="number" id="amountInput" placeholder="0.00" class="w-[45%]">
                         </div>
                     </div>
                     <div class="w-full sm:w-[calc(40%-0.75rem)] lg:w-40">
-                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1">ผู้แจ้งเบิก</label>
+                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1 text-center">ผู้แจ้งเบิก</label>
                         <input type="text" id="requesterInput" placeholder="ชื่อผู้แจ้ง">
                     </div>
-                    <div class="w-full lg:w-auto flex flex-col items-center">
-                        <button id="submitBtn" onclick="addEntry()" class="btn-add w-full lg:w-auto px-6 py-[10px] rounded-xl font-bold shadow-sm">บันทึก</button>
-                        <button id="cancelEditBtn" onclick="cancelEdit()" class="hidden text-[10px] text-gray-400 mt-1 hover:underline">ยกเลิก</button>
+                    <div class="w-full lg:w-auto">
+                        <button id="submitBtn" onclick="addEntry()" class="btn-add w-full lg:w-auto px-8 py-[10px] rounded-xl font-bold shadow-sm">บันทึก</button>
                     </div>
-                </div>
-            </div>
-
-            <!-- Filter Section -->
-            <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <h2 class="text-xl font-bold text-gray-700 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                    </svg>
-                    รายการบันทึกทั้งหมด
-                </h2>
-                <div class="flex items-center bg-white border border-pink-100 rounded-full px-4 py-1 shadow-sm">
-                    <span class="text-xs font-bold text-pink-400 mr-3 uppercase">ฟิลเตอร์ตามวัน:</span>
-                    <input type="date" id="filterDate" onchange="renderTable()" class="border-none p-1 text-sm bg-transparent focus:ring-0 w-auto">
-                    <button onclick="document.getElementById('filterDate').value=''; renderTable();" class="ml-2 text-gray-300 hover:text-pink-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
                 </div>
             </div>
 
@@ -250,21 +231,21 @@
                                 <th class="p-5">วันที่</th>
                                 <th class="p-5">ชื่อ-นามสกุล</th>
                                 <th class="p-5">รายละเอียด</th>
-                                <th class="p-5 text-center scb-col border-x border-pink-50 header-scb">ไทยพาณิชย์</th>
-                                <th class="p-5 text-center kbank-col border-x border-pink-50 header-kbank">กสิกรไทย</th>
+                                <th class="p-5 scb-col border-x border-pink-50 header-scb">ธนาคารไทยพาณิชย์</th>
+                                <th class="p-5 kbank-col border-x border-pink-50 header-kbank">ธนาคารกสิกรไทย</th>
                                 <th class="p-5">ผู้แจ้งเบิก</th>
-                                <th class="p-5 text-center">จัดการ</th>
+                                <th class="p-5">จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody id="tableBody" class="divide-y divide-pink-50">
+                        <tbody id="tableBody" class="divide-y divide-pink-50 text-center">
                         </tbody>
                         <tfoot class="bg-pink-50/20">
                             <tr class="font-bold">
-                                <td colspan="4" class="p-6 text-right text-pink-400 italic">ยอดรวมที่แสดง:</td>
+                                <td colspan="4" class="p-6 text-right text-pink-400 italic">ยอดรวมทั้งหมด:</td>
                                 <td id="totalSCB" class="p-6 text-center text-purple-600 text-lg border-x border-pink-100">0.00</td>
                                 <td id="totalKBANK" class="p-6 text-center text-green-600 text-lg border-x border-pink-100">0.00</td>
                                 <td colspan="2" class="p-6 text-center bg-white">
-                                    <span class="text-[10px] text-pink-300 block font-normal uppercase tracking-widest">Grand Total (Filtered)</span>
+                                    <span class="text-[10px] text-pink-300 block font-normal uppercase tracking-widest">Grand Total</span>
                                     <span class="text-3xl font-bold text-transparent bg-clip-text character-gradient">฿ <span id="grandTotal">0.00</span></span>
                                 </td>
                             </tr>
@@ -272,7 +253,7 @@
                     </table>
                 </div>
                 <div id="emptyState" class="p-20 text-center flex flex-col items-center bg-white">
-                    <p class="text-pink-200 font-medium tracking-widest uppercase text-xs">ไม่พบข้อมูลในรายการ</p>
+                    <p class="text-pink-200 font-medium tracking-widest uppercase text-xs">ยังไม่มีข้อมูลในรายการ</p>
                 </div>
             </div>
 
@@ -285,38 +266,32 @@
                 </button>
             </div>
         </div>
-
-        <div class="mt-8 text-center pb-10">
-            <p class="text-pink-200 text-[10px] tracking-[0.4em] uppercase font-bold">SWP Management System</p>
-        </div>
     </div>
 
     <!-- Modal Popup Section -->
     <div id="reportModal" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-end mb-4">
-                <button onclick="closeModalDirect()" class="text-gray-400 hover:text-red-500 transition-colors">
+                <button onclick="closeModalDirect()" class="text-gray-400 hover:text-red-500">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
             
-            <div class="report-header" id="modalHeaderTitle">
-                สรุปรายการค่าใช้จ่ายรายวัน บริษัท อีพีแอลเอ็กซ์แพนด จำกัด
-            </div>
-            <div class="mt-4 mb-2 text-md font-semibold text-gray-800" id="modalDateDisplay"></div>
+            <div class="report-header" id="modalHeaderTitle">สรุปรายการค่าใช้จ่าย บริษัท เอสดับเบิ้ลยูพี เวนเจอร์ จำกัด</div>
+            <div class="mt-4 mb-2 text-md font-semibold text-gray-800 text-center" id="modalDateDisplay"></div>
             
             <table class="report-table">
                 <thead>
                     <tr>
-                        <th width="10%">สถานะ</th>
+                        <th width="12%">สถานะ</th>
                         <th width="12%">วันที่</th>
                         <th width="20%">ชื่อ-นามสกุล ผู้รับเงิน</th>
                         <th width="20%">รายละเอียด</th>
                         <th width="12%" class="report-scb-header">ไทยพาณิชย์</th>
                         <th width="12%" class="report-kbank-header">กสิกรไทย</th>
-                        <th width="14%" class="report-requester-header">ผู้แจ้งเบิก</th>
+                        <th width="12%" class="report-requester-header">ผู้แจ้งเบิก</th>
                     </tr>
                 </thead>
                 <tbody id="modalTableBody">
@@ -343,15 +318,9 @@
 
         window.onload = function() {
             const today = new Date();
-            const dateStr = today.toISOString().split('T')[0];
-            
-            document.getElementById('dateInput').value = dateStr;
-            document.getElementById('filterDate').value = dateStr;
-            
+            document.getElementById('dateInput').value = today.toISOString().split('T')[0];
             const options = { day: 'numeric', month: 'long', year: 'numeric' };
             document.getElementById('header-date').innerText = today.toLocaleDateString('th-TH', options);
-            document.getElementById('statusInput').className = 'text-sm status-pending';
-            
             renderTable();
         };
 
@@ -359,36 +328,24 @@
             const tbody = document.getElementById('tableBody');
             const emptyState = document.getElementById('emptyState');
             const summaryActionArea = document.getElementById('summaryActionArea');
-            const filterDate = document.getElementById('filterDate').value;
             
             tbody.innerHTML = '';
-            
-            let filteredEntries = entries;
-            if (filterDate) {
-                const fDate = new Date(filterDate).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                filteredEntries = entries.filter(item => item.date === fDate);
-            }
-
-            const isEmpty = filteredEntries.length === 0;
+            const isEmpty = entries.length === 0;
             emptyState.style.display = isEmpty ? 'flex' : 'none';
-            summaryActionArea.classList.toggle('hidden', entries.length === 0);
+            summaryActionArea.classList.toggle('hidden', isEmpty);
             
-            let totalSCB = 0;
-            let totalKBANK = 0;
+            let totalSCB = 0, totalKBANK = 0;
 
-            filteredEntries.forEach((item, index) => {
-                const actualIndex = entries.findIndex(e => e === item);
-                
+            entries.forEach((item, index) => {
                 totalSCB += item.scb;
                 totalKBANK += item.kbank;
 
                 const row = document.createElement('tr');
-                row.className = "hover:bg-pink-50/20 transition-all duration-200";
                 const statusClass = item.status === 'อนุมัติ' ? 'status-approved' : 'status-pending';
 
                 row.innerHTML = `
                     <td class="p-5">
-                        <select onchange="updateStatus(${actualIndex}, this.value)" class="text-xs border-none bg-transparent ${statusClass}">
+                        <select onchange="updateStatus(${index}, this.value)" class="text-xs border-none bg-transparent ${statusClass}">
                             <option value="รออนุมัติ" ${item.status === 'รออนุมัติ' ? 'selected' : ''} class="status-pending">🔴 รออนุมัติ</option>
                             <option value="อนุมัติ" ${item.status === 'อนุมัติ' ? 'selected' : ''} class="status-approved">🟢 อนุมัติ</option>
                         </select>
@@ -401,20 +358,14 @@
                     <td class="p-5"><span class="bg-pink-50 text-pink-500 px-3 py-1 rounded-full text-[10px] font-bold border border-pink-100">${item.requester}</span></td>
                     <td class="p-5 text-center">
                         <div class="flex items-center justify-center space-x-2">
-                            <button onclick="editEntry(${actualIndex})" title="แก้ไข" class="bg-yellow-100 text-yellow-600 p-2 rounded-lg hover:bg-yellow-200 transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
+                            <button onclick="editEntry(${index})" class="bg-yellow-100 text-yellow-600 p-2 rounded-lg hover:bg-yellow-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                             </button>
-                            <button onclick="openReportModal(${actualIndex})" title="ดูสรุป" class="bg-blue-100 text-blue-600 p-2 rounded-lg hover:bg-blue-200 transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
+                            <button onclick="openReportModal(${index})" class="bg-blue-100 text-blue-600 p-2 rounded-lg hover:bg-blue-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                             </button>
-                            <button onclick="deleteEntry(${actualIndex})" title="ลบ" class="bg-red-50 text-red-300 p-2 rounded-lg hover:bg-red-500 hover:text-white transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
+                            <button onclick="deleteEntry(${index})" class="bg-red-50 text-red-300 p-2 rounded-lg hover:bg-red-500 hover:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             </button>
                         </div>
                     </td>
@@ -431,10 +382,10 @@
             const status = document.getElementById('statusInput').value;
             const rawDate = document.getElementById('dateInput').value;
             const name = document.getElementById('nameInput').value;
-            const requester = document.getElementById('requesterInput').value || '-';
             const reason = document.getElementById('reasonInput').value;
             const bank = document.getElementById('bankInput').value;
             const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+            const requester = document.getElementById('requesterInput').value || '-';
             const editIndex = parseInt(document.getElementById('editIndex').value);
 
             if (!name || !reason || amount <= 0) return;
@@ -443,22 +394,14 @@
             const formattedDate = dateObj.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
             const newEntry = {
-                status,
-                date: formattedDate,
-                rawDate,
-                name,
-                reason,
+                status, date: formattedDate, rawDate, name, reason,
                 scb: bank === 'SCB' ? amount : 0,
                 kbank: bank === 'KBANK' ? amount : 0,
-                requester: requester
+                requester
             };
 
-            if (editIndex > -1) {
-                entries[editIndex] = newEntry;
-                cancelEdit();
-            } else {
-                entries.push(newEntry);
-            }
+            if (editIndex > -1) { entries[editIndex] = newEntry; cancelEdit(); } 
+            else { entries.push(newEntry); }
             
             renderTable();
             clearForm();
@@ -468,24 +411,14 @@
             const item = entries[index];
             document.getElementById('editIndex').value = index;
             document.getElementById('statusInput').value = item.status;
-            document.getElementById('statusInput').className = 'text-sm ' + (item.status === 'รออนุมัติ' ? 'status-pending' : 'status-approved');
             document.getElementById('dateInput').value = item.rawDate;
             document.getElementById('nameInput').value = item.name;
             document.getElementById('reasonInput').value = item.reason;
             document.getElementById('requesterInput').value = item.requester;
-            
-            if (item.scb > 0) {
-                document.getElementById('bankInput').value = 'SCB';
-                document.getElementById('amountInput').value = item.scb;
-            } else {
-                document.getElementById('bankInput').value = 'KBANK';
-                document.getElementById('amountInput').value = item.kbank;
-            }
-
+            document.getElementById('bankInput').value = item.scb > 0 ? 'SCB' : 'KBANK';
+            document.getElementById('amountInput').value = item.scb > 0 ? item.scb : item.kbank;
             document.getElementById('submitBtn').innerText = 'อัปเดต';
             document.getElementById('submitBtn').classList.add('btn-update');
-            document.getElementById('cancelEditBtn').classList.remove('hidden');
-            
             document.getElementById('entryForm').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -493,7 +426,6 @@
             document.getElementById('editIndex').value = "-1";
             document.getElementById('submitBtn').innerText = 'บันทึก';
             document.getElementById('submitBtn').classList.remove('btn-update');
-            document.getElementById('cancelEditBtn').classList.add('hidden');
             clearForm();
         }
 
@@ -504,26 +436,19 @@
             document.getElementById('requesterInput').value = '';
         }
 
-        function updateStatus(index, newStatus) {
-            entries[index].status = newStatus;
-            renderTable();
-        }
-
-        function deleteEntry(index) {
-            entries.splice(index, 1);
-            renderTable();
-        }
+        function updateStatus(index, val) { entries[index].status = val; renderTable(); }
+        function deleteEntry(index) { entries.splice(index, 1); renderTable(); }
 
         function openReportModal(index) {
             const item = entries[index];
             const modal = document.getElementById('reportModal');
             const tbody = document.getElementById('modalTableBody');
-            document.getElementById('modalHeaderTitle').innerText = 'สรุปรายการค่าใช้จ่ายรายแถว';
-            document.getElementById('modalDateDisplay').innerText = `รายการวันที่: ${item.date}`;
+            const statusStyle = item.status === 'อนุมัติ' ? 'color: #10b981;' : 'color: #ef4444;';
             
+            document.getElementById('modalDateDisplay').innerText = `รายการวันที่: ${item.date}`;
             tbody.innerHTML = `
                 <tr>
-                    <td class="${item.status === 'อนุมัติ' ? 'text-green-600' : 'text-red-500'} font-bold">${item.status}</td>
+                    <td style="${statusStyle} font-weight: bold;">${item.status}</td>
                     <td>${item.date}</td>
                     <td class="text-left">${item.name}</td>
                     <td class="text-left">${item.reason}</td>
@@ -539,34 +464,16 @@
         }
 
         function openDailySummary() {
-            if (entries.length === 0) return;
             const modal = document.getElementById('reportModal');
             const tbody = document.getElementById('modalTableBody');
-            
-            const filterDate = document.getElementById('filterDate').value;
-            let displayEntries = entries;
-            let summaryTitle = 'สรุปรายการค่าใช้จ่ายทั้งหมด บริษัท อีพีแอลเอ็กซ์แพนด จำกัด';
-            let dateDisplay = 'ข้อมูลทั้งหมด';
+            let totalSCB = 0, totalKBank = 0, htmlRows = '';
 
-            if (filterDate) {
-                const fDate = new Date(filterDate).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                displayEntries = entries.filter(item => item.date === fDate);
-                summaryTitle = 'สรุปรายการค่าใช้จ่ายรายวัน บริษัท อีพีแอลเอ็กซ์แพนด จำกัด';
-                dateDisplay = `ข้อมูลสรุป ณ วันที่: ${fDate}`;
-            }
-
-            document.getElementById('modalHeaderTitle').innerText = summaryTitle;
-            document.getElementById('modalDateDisplay').innerText = dateDisplay;
-            
-            let totalSCB = 0;
-            let totalKBank = 0;
-            let htmlRows = '';
-            displayEntries.forEach(item => {
-                totalSCB += item.scb;
-                totalKBank += item.kbank;
+            entries.forEach(item => {
+                totalSCB += item.scb; totalKBank += item.kbank;
+                const statusStyle = item.status === 'อนุมัติ' ? 'color: #10b981;' : 'color: #ef4444;';
                 htmlRows += `
                     <tr>
-                        <td class="${item.status === 'อนุมัติ' ? 'text-green-600' : 'text-red-500'} font-bold">${item.status}</td>
+                        <td style="${statusStyle} font-weight: bold;">${item.status}</td>
                         <td>${item.date}</td>
                         <td class="text-left">${item.name}</td>
                         <td class="text-left">${item.reason}</td>
@@ -577,6 +484,7 @@
                 `;
             });
             tbody.innerHTML = htmlRows;
+            document.getElementById('modalDateDisplay').innerText = 'ข้อมูลสรุปรายการเบิกทั้งหมด';
             document.getElementById('modalSumSCB').innerText = totalSCB.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('modalSumKBank').innerText = totalKBank.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('modalGrandTotal').innerText = (totalSCB + totalKBank).toLocaleString(undefined, {minimumFractionDigits: 2});
