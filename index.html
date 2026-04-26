@@ -39,13 +39,14 @@
 
         input, select {
             border: 1px solid #fce4ec;
-            padding: 12px;
-            border-radius: 16px;
+            padding: 10px 12px;
+            border-radius: 12px;
             width: 100%;
             background-color: #fff;
             color: #000;
             transition: all 0.3s ease;
             font-family: 'IBM Plex Sans Thai', sans-serif;
+            font-size: 0.875rem;
         }
         input:focus, select:focus {
             outline: none;
@@ -56,6 +57,7 @@
             background: linear-gradient(to right, #ff85b3, #9d65ff);
             color: white;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
         .btn-add:hover {
             transform: translateY(-2px);
@@ -143,7 +145,7 @@
 </head>
 <body class="p-4 md:p-10">
 
-    <div class="max-w-6xl mx-auto">
+    <div class="max-w-7xl mx-auto">
         <!-- Header Section -->
         <div class="character-gradient p-8 rounded-t-[2.5rem] flex flex-col md:flex-row justify-between items-center border-b-4 border-white/40 shadow-sm">
             <div class="flex items-center space-x-6">
@@ -174,48 +176,48 @@
         </div>
 
         <!-- Main Card -->
-        <div class="custom-card p-6 md:p-10 rounded-b-[2.5rem]">
-            <!-- Form Area -->
-            <div id="entryForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4 bg-pink-50/40 p-6 rounded-t-[2rem] border-x border-t border-pink-100/60">
+        <div class="custom-card p-6 md:p-8 rounded-b-[2.5rem]">
+            <!-- Form Area - Compact Single Row -->
+            <div id="entryForm" class="bg-pink-50/40 p-5 rounded-[2rem] border border-pink-100/60 mb-10">
                 <input type="hidden" id="editIndex" value="-1">
-                <div class="space-y-1">
-                    <label class="text-xs font-bold text-pink-400 uppercase ml-1">สถานะ</label>
-                    <select id="statusInput" onchange="this.className = this.value === 'รออนุมัติ' ? 'status-pending' : 'status-approved'">
-                        <option value="รออนุมัติ" class="status-pending">🔴 รออนุมัติ</option>
-                        <option value="อนุมัติ" class="status-approved">🟢 อนุมัติ</option>
-                    </select>
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs font-bold text-pink-400 uppercase ml-1">วันที่</label>
-                    <input type="date" id="dateInput">
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs font-bold text-pink-400 uppercase ml-1">ชื่อ-นามสกุล (ผู้รับเงิน)</label>
-                    <input type="text" id="nameInput" placeholder="ระบุชื่อผู้รับเงิน">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10 bg-pink-50/40 p-6 rounded-b-[2rem] border-x border-b border-pink-100/60">
-                <div class="space-y-1 md:col-span-1">
-                    <label class="text-xs font-bold text-pink-400 uppercase ml-1">รายละเอียด</label>
-                    <input type="text" id="reasonInput" placeholder="ระบุข้อมูลการเบิก">
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs font-bold text-pink-400 uppercase ml-1">ธนาคาร & ยอดเงิน</label>
-                    <div class="flex space-x-2">
-                        <select id="bankInput" class="w-[55%] text-sm">
-                            <option value="SCB">ไทยพาณิชย์</option>
-                            <option value="KBANK">กสิกรไทย</option>
+                <div class="flex flex-wrap lg:flex-nowrap gap-3 items-end">
+                    <div class="w-full sm:w-[calc(50%-0.75rem)] lg:w-32">
+                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1">สถานะ</label>
+                        <select id="statusInput" onchange="this.className = 'text-sm ' + (this.value === 'รออนุมัติ' ? 'status-pending' : 'status-approved')">
+                            <option value="รออนุมัติ" class="status-pending">🔴 รออนุมัติ</option>
+                            <option value="อนุมัติ" class="status-approved">🟢 อนุมัติ</option>
                         </select>
-                        <input type="number" id="amountInput" placeholder="0.00" class="w-[45%]">
                     </div>
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs font-bold text-pink-400 uppercase ml-1">ผู้แจ้งเบิก</label>
-                    <input type="text" id="requesterInput" placeholder="ระบุชื่อผู้แจ้ง">
-                </div>
-                <div class="space-y-1 flex flex-col justify-end">
-                    <button id="submitBtn" onclick="addEntry()" class="btn-add px-6 py-3 rounded-2xl font-bold shadow-md">เพิ่มรายการบันทึก</button>
-                    <button id="cancelEditBtn" onclick="cancelEdit()" class="hidden text-xs text-gray-400 mt-2 hover:underline">ยกเลิกการแก้ไข</button>
+                    <div class="w-full sm:w-[calc(50%-0.75rem)] lg:w-40">
+                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1">วันที่</label>
+                        <input type="date" id="dateInput">
+                    </div>
+                    <div class="w-full sm:w-[calc(50%-0.75rem)] lg:flex-1">
+                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1">ชื่อ-นามสกุล (ผู้รับเงิน)</label>
+                        <input type="text" id="nameInput" placeholder="ผู้รับเงิน">
+                    </div>
+                    <div class="w-full sm:w-[calc(50%-0.75rem)] lg:flex-1">
+                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1">รายละเอียด</label>
+                        <input type="text" id="reasonInput" placeholder="ระบุข้อมูลการเบิก">
+                    </div>
+                    <div class="w-full sm:w-[calc(60%-0.75rem)] lg:w-60">
+                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1">ธนาคาร & ยอดเงิน</label>
+                        <div class="flex space-x-1">
+                            <select id="bankInput" class="w-[45%]">
+                                <option value="SCB">SCB</option>
+                                <option value="KBANK">KBANK</option>
+                            </select>
+                            <input type="number" id="amountInput" placeholder="0.00" class="w-[55%]">
+                        </div>
+                    </div>
+                    <div class="w-full sm:w-[calc(40%-0.75rem)] lg:w-40">
+                        <label class="text-[10px] font-bold text-pink-400 uppercase ml-1 block mb-1">ผู้แจ้งเบิก</label>
+                        <input type="text" id="requesterInput" placeholder="ชื่อผู้แจ้ง">
+                    </div>
+                    <div class="w-full lg:w-auto flex flex-col items-center">
+                        <button id="submitBtn" onclick="addEntry()" class="btn-add w-full lg:w-auto px-6 py-[10px] rounded-xl font-bold shadow-sm">บันทึก</button>
+                        <button id="cancelEditBtn" onclick="cancelEdit()" class="hidden text-[10px] text-gray-400 mt-1 hover:underline">ยกเลิก</button>
+                    </div>
                 </div>
             </div>
 
@@ -240,33 +242,35 @@
 
             <!-- Table Area -->
             <div class="overflow-hidden rounded-[1.5rem] border border-pink-50 shadow-sm bg-white">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="table-header">
-                            <th class="p-5">สถานะ</th>
-                            <th class="p-5">วันที่</th>
-                            <th class="p-5">ชื่อ-นามสกุล</th>
-                            <th class="p-5">รายละเอียด</th>
-                            <th class="p-5 text-center scb-col border-x border-pink-50 header-scb">ไทยพาณิชย์</th>
-                            <th class="p-5 text-center kbank-col border-x border-pink-50 header-kbank">กสิกรไทย</th>
-                            <th class="p-5">ผู้แจ้งเบิก</th>
-                            <th class="p-5 text-center">จัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody" class="divide-y divide-pink-50">
-                    </tbody>
-                    <tfoot class="bg-pink-50/20">
-                        <tr class="font-bold">
-                            <td colspan="4" class="p-6 text-right text-pink-400 italic">ยอดรวมที่แสดง:</td>
-                            <td id="totalSCB" class="p-6 text-center text-purple-600 text-lg border-x border-pink-100">0.00</td>
-                            <td id="totalKBANK" class="p-6 text-center text-green-600 text-lg border-x border-pink-100">0.00</td>
-                            <td colspan="2" class="p-6 text-center bg-white">
-                                <span class="text-[10px] text-pink-300 block font-normal uppercase tracking-widest">Grand Total (Filtered)</span>
-                                <span class="text-3xl font-bold text-transparent bg-clip-text character-gradient">฿ <span id="grandTotal">0.00</span></span>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[1000px]">
+                        <thead>
+                            <tr class="table-header">
+                                <th class="p-5">สถานะ</th>
+                                <th class="p-5">วันที่</th>
+                                <th class="p-5">ชื่อ-นามสกุล</th>
+                                <th class="p-5">รายละเอียด</th>
+                                <th class="p-5 text-center scb-col border-x border-pink-50 header-scb">ไทยพาณิชย์</th>
+                                <th class="p-5 text-center kbank-col border-x border-pink-50 header-kbank">กสิกรไทย</th>
+                                <th class="p-5">ผู้แจ้งเบิก</th>
+                                <th class="p-5 text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-pink-50">
+                        </tbody>
+                        <tfoot class="bg-pink-50/20">
+                            <tr class="font-bold">
+                                <td colspan="4" class="p-6 text-right text-pink-400 italic">ยอดรวมที่แสดง:</td>
+                                <td id="totalSCB" class="p-6 text-center text-purple-600 text-lg border-x border-pink-100">0.00</td>
+                                <td id="totalKBANK" class="p-6 text-center text-green-600 text-lg border-x border-pink-100">0.00</td>
+                                <td colspan="2" class="p-6 text-center bg-white">
+                                    <span class="text-[10px] text-pink-300 block font-normal uppercase tracking-widest">Grand Total (Filtered)</span>
+                                    <span class="text-3xl font-bold text-transparent bg-clip-text character-gradient">฿ <span id="grandTotal">0.00</span></span>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
                 <div id="emptyState" class="p-20 text-center flex flex-col items-center bg-white">
                     <p class="text-pink-200 font-medium tracking-widest uppercase text-xs">ไม่พบข้อมูลในรายการ</p>
                 </div>
@@ -346,7 +350,7 @@
             
             const options = { day: 'numeric', month: 'long', year: 'numeric' };
             document.getElementById('header-date').innerText = today.toLocaleDateString('th-TH', options);
-            document.getElementById('statusInput').className = 'status-pending';
+            document.getElementById('statusInput').className = 'text-sm status-pending';
             
             renderTable();
         };
@@ -464,7 +468,7 @@
             const item = entries[index];
             document.getElementById('editIndex').value = index;
             document.getElementById('statusInput').value = item.status;
-            document.getElementById('statusInput').className = item.status === 'รออนุมัติ' ? 'status-pending' : 'status-approved';
+            document.getElementById('statusInput').className = 'text-sm ' + (item.status === 'รออนุมัติ' ? 'status-pending' : 'status-approved');
             document.getElementById('dateInput').value = item.rawDate;
             document.getElementById('nameInput').value = item.name;
             document.getElementById('reasonInput').value = item.reason;
@@ -478,7 +482,7 @@
                 document.getElementById('amountInput').value = item.kbank;
             }
 
-            document.getElementById('submitBtn').innerText = 'บันทึกการแก้ไข';
+            document.getElementById('submitBtn').innerText = 'อัปเดต';
             document.getElementById('submitBtn').classList.add('btn-update');
             document.getElementById('cancelEditBtn').classList.remove('hidden');
             
@@ -487,7 +491,7 @@
 
         function cancelEdit() {
             document.getElementById('editIndex').value = "-1";
-            document.getElementById('submitBtn').innerText = 'เพิ่มรายการบันทึก';
+            document.getElementById('submitBtn').innerText = 'บันทึก';
             document.getElementById('submitBtn').classList.remove('btn-update');
             document.getElementById('cancelEditBtn').classList.add('hidden');
             clearForm();
