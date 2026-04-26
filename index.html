@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบเบิกเงินสำรองจ่าย SWP Venture (Cloud)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- ExcelJS & FileSaver for Advanced Styling -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
@@ -334,10 +335,13 @@
 
         initAuth();
 
-        async function fetchData() {
+      async function fetchData() {
             if (!user) return;
+            
+            // แสดงสถานะกำลังโหลด
             document.getElementById('loadingState').classList.remove('hidden');
             document.getElementById('emptyState').classList.add('hidden');
+            
             const filterDate = document.getElementById('filterDate').value;
             const displayDate = filterDate ? new Date(filterDate).toLocaleDateString('th-TH') : 'ทั้งหมด';
             document.getElementById('currentFilterDateDisplay').innerText = displayDate;
@@ -346,28 +350,42 @@
                 const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'expenses');
                 const snapshot = await getDocs(colRef);
                 let data = [];
-                snapshot.forEach(doc => { data.push({ id: doc.id, ...doc.data() }); });
-                updateStorageUsage(data.length);
                 
+                // --- จุดที่ปรับปรุง: ดึงข้อมูลและล้างคำว่า "คุณ" ออกจากชื่อทันที ---
+                snapshot.forEach(doc => { 
+                    const d = doc.data();
+                    // ตรวจสอบและตัดคำว่า "คุณ" ออกจากหน้าชื่อ
+                    const cleanName = d.name ? d.name.replace(/^คุณ\s?/, "").trim() : "";
+                    data.push({ id: doc.id, ...d, name: cleanName }); 
+                });
+                // -------------------------------------------------------
+
+                updateStorageUsage(data.length);
+                allEntries = data; // เก็บข้อมูลที่สะอาดแล้วลง allEntries เพื่อใช้ใน Autocomplete
+
                 let displayData = [...data];
                 if (filterDate) { 
                     displayData = displayData.filter(item => item.rawDate === filterDate); 
                 }
 
-                // --- ปรับการเรียงลำดับที่นี่ ---
+                // เรียงลำดับข้อมูล: วันที่น้อยไปมาก และเวลาบันทึกน้อยไปมาก
                 displayData.sort((a, b) => {
-                    // 1. เรียงตามวันที่ (rawDate) จากน้อยไปมาก
                     if (a.rawDate !== b.rawDate) {
                         return new Date(a.rawDate) - new Date(b.rawDate);
                     }
-                    // 2. ถ้าวันที่เดียวกัน ให้เรียงตามเวลาที่กดบันทึก (updatedAt) จากน้อยไปมาก
                     return new Date(a.updatedAt) - new Date(b.updatedAt);
                 });
 
-                allEntries = data; 
+                // แสดงผลข้อมูลในตาราง
                 renderTable(displayData);
-		updateNameSuggestions();
-            } catch (err) { console.error("Fetch error", err); } finally {
+                
+                // อัปเดตรายชื่อแนะนำ (Autocomplete) ให้ไม่มีคำว่า "คุณ"
+                updateNameSuggestions();
+
+            } catch (err) {
+                console.error("Fetch error", err);
+                alert("ไม่สามารถดึงข้อมูลจาก Cloud ได้");
+            } finally {
                 document.getElementById('loadingState').classList.add('hidden');
             }
         }
@@ -419,45 +437,86 @@
             document.getElementById('grandTotal').innerText = (tSCB + tKB).toLocaleString(undefined, {minimumFractionDigits: 2});
         }
 
-        async function saveToCloud() {
-            if (!user) return;
-            const docId = document.getElementById('editDocId').value;
-            const status = document.getElementById('statusInput').value;
-            const rawDate = document.getElementById('dateInput').value;
-            const name = document.getElementById('nameInput').value;
-            const bank = document.getElementById('bankInput').value;
-            const amount = parseFloat(document.getElementById('amountInput').value) || 0;
-            const requester = document.getElementById('requesterInput').value || '-';
+    async function saveToCloud() {
+    if (!user) return;
+    const docId = document.getElementById('editDocId').value;
+    const status = document.getElementById('statusInput').value;
+    const rawDate = document.getElementById('dateInput').value;
+    const bank = document.getElementById('bankInput').value;
+    const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+    const requester = document.getElementById('requesterInput').value || '-';
 
-            // --- ส่วนที่ปรับปรุงใหม่ ---
-            let reason = document.getElementById('reasonInput').value;
-            const otherReason = document.getElementById('otherReasonInput').value;
-            
-            // หากเลือก "อื่นๆ" ให้ใช้ค่าจากช่องกรอกเพิ่มแทน
-            if (reason === 'อื่นๆ') {
-                if (!otherReason) {
-                    alert("กรุณาระบุรายละเอียดอื่นๆ");
-                    return;
-                }
-                reason = otherReason;
-            }
-            // -----------------------
+    // ดึงชื่อและตัดคำว่า "คุณ" ออก
+    let name = document.getElementById('nameInput').value.trim();
+    name = name.replace(/^คุณ\s?/, "").trim(); 
 
-            if (!name || !reason || amount <= 0 || !rawDate) {
-                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
-                return;
-            }
-            const dateObj = new Date(rawDate);
-            const formattedDate = dateObj.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const payload = { status, date: formattedDate, rawDate, name, reason, 
-                            scb: bank === 'SCB' ? amount : 0, kbank: bank === 'KBANK' ? amount : 0, 
-                            requester, updatedAt: new Date().toISOString() };
-            try {
-                if (docId) { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'expenses', docId), payload, { merge: true }); } 
-                else { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'expenses'), payload); }
-                cancelEdit(); fetchData();
-            } catch (err) { console.error("Save error", err); }
+    let reason = document.getElementById('reasonInput').value;
+    const otherReason = document.getElementById('otherReasonInput').value;
+    
+    if (reason === 'อื่นๆ') {
+        if (!otherReason) {
+            // --- เปลี่ยนเป็น SweetAlert2 (กรณีลืมระบุเหตุผลอื่นๆ) ---
+            Swal.fire({
+                title: 'อุ๊ย! ลืมระบุรายละเอียด',
+                text: 'กรุณาระบุรายละเอียดอื่นๆ ด้วยนะครับ',
+                icon: 'warning',
+                confirmButtonColor: '#ffafcc',
+                confirmButtonText: 'ตกลง'
+            });
+            return;
         }
+        reason = otherReason;
+    }
+
+    if (!name || !reason || amount <= 0 || !rawDate) {
+        // --- เปลี่ยนเป็น SweetAlert2 (กรณีกรอกข้อมูลไม่ครบ) ---
+        Swal.fire({
+            title: 'ข้อมูลไม่ครบถ้วน',
+            text: 'ตรวจสอบ ชื่อ, เหตุผล, จำนวนเงิน และวันที่ อีกครั้งนะครับ',
+            icon: 'info',
+            confirmButtonColor: '#b388ff',
+            confirmButtonText: 'เข้าใจแล้ว'
+        });
+        return;
+    }
+
+    const dateObj = new Date(rawDate);
+    const formattedDate = dateObj.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const payload = { 
+        status, date: formattedDate, rawDate, name, reason, 
+        scb: bank === 'SCB' ? amount : 0, kbank: bank === 'KBANK' ? amount : 0, 
+        requester, updatedAt: new Date().toISOString() 
+    };
+
+    try {
+        if (docId) { 
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'expenses', docId), payload, { merge: true }); 
+        } else { 
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'expenses'), payload); 
+        }
+
+        // --- เปลี่ยนเป็น SweetAlert2 (บันทึกสำเร็จ) ---
+        Swal.fire({
+            title: 'บันทึกเรียบร้อย!',
+            text: 'ข้อมูลถูกส่งขึ้น Cloud แล้วครับ',
+            icon: 'success',
+            timer: 2000, // หายไปเองใน 2 วินาที
+            showConfirmButton: false,
+            background: '#fff9fb'
+        });
+
+        cancelEdit(); 
+        fetchData();
+    } catch (err) { 
+        console.error("Save error", err); 
+        Swal.fire({
+            title: 'เกิดข้อผิดพลาด',
+            text: 'ไม่สามารถบันทึกข้อมูลได้ โปรดลองอีกครั้ง',
+            icon: 'error',
+            confirmButtonColor: '#ff4d4d'
+        });
+    }
+}
 
         async function deleteEntry(id) {
             if (!confirm("ลบข้อมูลออกจาก Cloud?")) return;
@@ -492,7 +551,7 @@
                     otherInput.value = '';
                 }
             }
-        }
+        }																						
 
         // ปรับปรุงฟังก์ชันล้างค่าเดิม (Update cancelEdit)
         function cancelEdit() {
@@ -702,18 +761,20 @@
         initAuth();  // เชื่อมต่อระบบ Cloud
         fetchData(); // ดึงข้อมูลมาแสดงครั้งแรก
 function updateNameSuggestions() {
+    const nameInput = document.getElementById('nameInput'); // หาช่องกรอกชื่อ
     const datalist = document.getElementById('nameSuggestions');
-    if (!datalist) return;
     
-    // ดึงชื่อที่ไม่ซ้ำกันจากข้อมูลทั้งหมดที่มีใน allEntries
-    const uniqueNames = [...new Set(allEntries.map(item => item.name))];
-    
-    // สร้างรายการตัวเลือกใน datalist
-    datalist.innerHTML = uniqueNames
-        .map(name => `<option value="${name}">`)
-        .join('');
-}
-        
+    nameInput.oninput = function() {
+        const val = this.value.trim();
+        // แก้ตรงนี้: ถ้าพิมพ์มากกว่าหรือเท่ากับ 1 ตัวอักษรค่อยแสดงรายชื่อ
+        if (val.length >= 1) { 
+            const uniqueNames = [...new Set(allEntries.map(item => item.name))];
+            datalist.innerHTML = uniqueNames.map(name => `<option value="${name}">`).join('');
+        } else {
+            datalist.innerHTML = ''; // ถ้าว่างเปล่าให้ล้างรายการทิ้ง
+        }
+    };
+}        
     </script>
 </body>
 </html>
