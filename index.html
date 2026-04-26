@@ -171,8 +171,9 @@
                         <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">วันที่</label>
                         <input type="date" id="dateInput">
                     </div>
-                    <div class="w-full sm:w-[calc(50%-0.75rem)] lg:flex-1">
-                        <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">ชื่อ-นามสกุล (ผู้รับเงิน)</label>
+                    <!-- ขยายช่องชื่อ-นามสกุล โดยเพิ่ม flex-grow หรือระบุ flex-[1.5] -->
+                    <div class="w-full sm:w-full lg:flex-[1.5]">
+                        <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">ชื่อ-นามสกุล</label>
                         <input type="text" id="nameInput" placeholder="ระบุชื่อ">
                     </div>
                     <div class="w-full sm:w-[calc(50%-0.75rem)] lg:flex-1">
