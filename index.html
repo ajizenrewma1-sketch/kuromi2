@@ -30,15 +30,14 @@
         .table-header th {
             color: #000000;
             font-weight: 600;
-            font-size: 1rem;
-            padding: 1.25rem 1rem;
+            font-size: 0.9rem;
+            padding: 1.25rem 0.5rem;
             letter-spacing: 0.5px;
             text-align: center;
         }
         .header-scb { color: #d81b60 !important; }
         .header-kbank { color: #2e6b36 !important; }
 
-        /* จัดระเบียบตัวอักษรในช่องกรอกให้อยู่ตรงกลางเสมอ */
         input, select {
             border: 1px solid #fce4ec;
             padding: 10px 12px;
@@ -49,8 +48,8 @@
             transition: all 0.3s ease;
             font-family: 'IBM Plex Sans Thai', sans-serif;
             font-size: 0.875rem;
-            text-align: center; /* จัดกึ่งกลาง */
-            text-align-last: center; /* สำหรับ select */
+            text-align: center;
+            text-align-last: center;
         }
         input:focus, select:focus {
             outline: none;
@@ -97,7 +96,7 @@
             padding: 2rem;
             border-radius: 8px;
             max-width: 95%;
-            width: 1100px;
+            width: 1150px;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
@@ -106,9 +105,10 @@
             background-color: #777777;
             color: white;
             text-align: center;
-            padding: 10px;
+            padding: 12px;
             font-weight: bold;
             font-size: 1.25rem;
+            letter-spacing: 0.5px;
         }
         .report-table {
             width: 100%;
@@ -120,6 +120,7 @@
             padding: 8px;
             text-align: center;
             color: #000;
+            font-size: 0.85rem;
         }
         .report-table th {
             background-color: #f2f2f2;
@@ -171,7 +172,6 @@
                         <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">วันที่</label>
                         <input type="date" id="dateInput">
                     </div>
-                    <!-- ขยายช่องชื่อ-นามสกุล โดยเพิ่ม flex-grow หรือระบุ flex-[1.5] -->
                     <div class="w-full sm:w-full lg:flex-[1.5]">
                         <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">ชื่อ-นามสกุล</label>
                         <input type="text" id="nameInput" placeholder="ระบุชื่อ">
@@ -180,12 +180,12 @@
                         <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">รายละเอียด</label>
                         <input type="text" id="reasonInput" placeholder="ระบุรายการเบิก">
                     </div>
-                    <div class="w-full sm:w-[calc(60%-0.75rem)] lg:w-60">
+                    <div class="w-full sm:w-[calc(60%-0.75rem)] lg:w-72">
                         <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">ธนาคาร & ยอดเงิน</label>
                         <div class="flex space-x-1">
-                            <select id="bankInput" class="w-24">
-                                <option value="SCB">SCB</option>
-                                <option value="KBANK">KBANK</option>
+                            <select id="bankInput" class="w-40">
+                                <option value="SCB">ธนาคารไทยพาณิชย์</option>
+                                <option value="KBANK">ธนาคารกสิกรไทย</option>
                             </select>
                             <input type="number" id="amountInput" placeholder="0.00" class="flex-1">
                         </div>
@@ -203,15 +203,15 @@
             <!-- Table -->
             <div class="overflow-hidden rounded-[1.5rem] border border-pink-50 shadow-sm bg-white">
                 <div class="overflow-x-auto">
-                    <table class="w-full border-collapse min-w-[900px]">
+                    <table class="w-full border-collapse min-w-[1000px]">
                         <thead>
                             <tr class="table-header">
                                 <th class="p-5">สถานะ</th>
                                 <th class="p-5">วันที่</th>
                                 <th class="p-5">ชื่อ-นามสกุล</th>
                                 <th class="p-5">รายละเอียด</th>
-                                <th class="p-5 scb-col border-x border-pink-50 header-scb">SCB</th>
-                                <th class="p-5 kbank-col border-x border-pink-50 header-kbank">KBANK</th>
+                                <th class="p-5 scb-col border-x border-pink-50 header-scb">ธนาคารไทยพาณิชย์</th>
+                                <th class="p-5 kbank-col border-x border-pink-50 header-kbank">ธนาคารกสิกรไทย</th>
                                 <th class="p-5">ผู้แจ้งเบิก</th>
                                 <th class="p-5">จัดการ</th>
                             </tr>
@@ -225,7 +225,7 @@
                                 <td id="totalKBANK" class="p-6 text-center text-green-600 text-lg border-x border-pink-100">0.00</td>
                                 <td colspan="2" class="p-6 text-center bg-white">
                                     <span class="text-[10px] text-pink-300 block font-normal uppercase tracking-widest">Grand Total</span>
-                                    <span class="text-3xl font-bold text-transparent bg-clip-text character-gradient">฿ <span id="grandTotal">0.00</span></span>
+                                    <span class="text-3xl font-bold text-black">฿ <span id="grandTotal">0.00</span></span>
                                 </td>
                             </tr>
                         </tfoot>
@@ -250,18 +250,19 @@
             <div class="flex justify-end mb-2">
                 <button onclick="closeModalDirect()" class="text-gray-400 hover:text-red-500">✕</button>
             </div>
-            <div class="report-header" id="modalHeaderTitle">สรุปรายการค่าใช้จ่าย SWP Venture</div>
+            <!-- แก้ไขส่วนหัวข้อตามความต้องการของผู้ใช้ -->
+            <div class="report-header" id="modalHeaderTitle">สรุปรายการค่าใช้จ่ายรายวัน บริษัท เอสดับเบิ้ลยูพี เวนเจอร์ จำกัด</div>
             <div class="mt-4 mb-2 text-md font-semibold text-gray-800 text-center" id="modalDateDisplay"></div>
             <table class="report-table">
                 <thead>
                     <tr>
-                        <th width="12%">สถานะ</th>
-                        <th width="12%">วันที่</th>
-                        <th width="20%">ชื่อ-นามสกุล</th>
-                        <th width="20%">รายละเอียด</th>
-                        <th width="12%" class="report-scb-header">SCB</th>
-                        <th width="12%" class="report-kbank-header">KBANK</th>
-                        <th width="12%">ผู้แจ้งเบิก</th>
+                        <th width="10%">สถานะ</th>
+                        <th width="10%">วันที่</th>
+                        <th width="18%">ชื่อ-นามสกุล</th>
+                        <th width="18%">รายละเอียด</th>
+                        <th width="15%" class="report-scb-header">ธนาคารไทยพาณิชย์</th>
+                        <th width="15%" class="report-kbank-header">ธนาคารกสิกรไทย</th>
+                        <th width="14%">ผู้แจ้งเบิก</th>
                     </tr>
                 </thead>
                 <tbody id="modalTableBody"></tbody>
