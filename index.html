@@ -13,49 +13,103 @@
     <style>
         body {
             font-family: 'IBM Plex Sans Thai', sans-serif;
-            background-color: #fff9fb;
-            background-image: radial-gradient(#ffdce9 0.8px, transparent 0.8px);
-            background-size: 24px 24px;
+            background-color: #f8fafc; /* เปลี่ยนเป็นเทาอ่อนนวลๆ สไตล์ Dashboard */
+            background-image: none; /* เอาลายจุดออกเพื่อให้ดูสะอาดตา */
         }
+
+        /* --- Header & Card Style (Professional Indigo/Navy) --- */
         .character-gradient {
-            background: linear-gradient(135deg, #ffafcc 0%, #b388ff 100%);
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%); /* น้ำเงินเข้ม Slate */
         }
         .custom-card {
-            background: rgba(255, 255, 255, 0.98);
-            border: 2px solid #ffdae9;
-            box-shadow: 0 20px 40px -10px rgba(255, 175, 204, 0.2);
-            border-radius: 2.5rem;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 0.75rem; /* ลดความโค้งให้ดูเป็นทางการมากขึ้น */
         }
-        .table-header { background-color: #ffffff; border-bottom: 2px solid #f3f4f6; }
-        .table-header th { color: #000; font-weight: 600; font-size: 0.9rem; padding: 1.25rem 0.5rem; text-align: center; }
-        .header-scb { color: #d81b60 !important; }
-        .header-kbank { color: #2e6b36 !important; }
-        input, select { border: 1px solid #fce4ec; padding: 10px 12px; border-radius: 12px; width: 100%; text-align: center; font-size: 0.875rem; }
-        input:focus, select:focus { outline: none; border-color: #ff85b3; box-shadow: 0 0 0 4px rgba(255, 133, 179, 0.15); }
-        .btn-add { background: linear-gradient(to right, #ff85b3, #9d65ff); color: white; transition: all 0.3s ease; }
-        .btn-update { background: linear-gradient(to right, #4facfe, #00f2fe); color: white; }
+
+        /* --- Table Styling (Main) --- */
+        .table-header { background-color: #f1f5f9; border-bottom: 1px solid #cbd5e1; }
+        .table-header th { color: #334155; font-weight: 600; font-size: 0.85rem; padding: 1rem 0.5rem; text-align: center; }
+        .header-scb { color: #6b21a8 !important; } /* สีม่วงเข้ม SCB */
+        .header-kbank { color: #166534 !important; } /* สีเขียวเข้ม KBANK */
         .scb-col { background-color: #fcfaff; }
-        .kbank-col { background-color: #f6fff9; }
-        .status-pending { color: #ef4444; font-weight: bold; }
-        .status-approved { color: #10b981; font-weight: bold; }
-        .modal-overlay { background-color: rgba(0, 0, 0, 0.5); display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 2rem; border-radius: 8px; max-width: 95%; width: 1150px; max-height: 90vh; overflow-y: auto; }
-        .report-header { background-color: #777777; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 1.25rem; }
+        .kbank-col { background-color: #f7fee7; }
+
+        /* --- Input & Form Elements --- */
+        input, select { 
+            border: 1px solid #cbd5e1; 
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            width: 100%; 
+            text-align: left; /* เปลี่ยนเป็นชิดซ้ายแบบมาตรฐาน */
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        input:focus, select:focus { 
+            outline: none; 
+            border-color: #3b82f6; 
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); 
+        }
+
+        /* --- Buttons --- */
+        .btn-add { background: #2563eb; color: white; transition: all 0.2s ease; border-radius: 6px; }
+        .btn-add:hover { background: #1d4ed8; transform: translateY(-1px); }
+        .btn-update { background: #0ea5e9; color: white; border-radius: 6px; }
+        
+        .btn-summary { 
+            background: #334155; /* ปุ่มสีเทาเข้มดูเป็นทางการ */
+            color: white; padding: 10px 24px; border-radius: 6px; font-weight: 500; 
+            transition: all 0.2s;
+        }
+        .btn-summary:hover { background: #1e293b; }
+
+        .btn-excel { 
+            background: #059669; /* เขียว Excel มาตรฐาน */
+            color: white; padding: 10px 20px; border-radius: 6px; font-weight: 500; margin-top: 15px; 
+        }
+
+        /* --- Status Colors (ให้ความรู้สึกปลอดภัยและชัดเจน) --- */
+        .status-pending { color: #dc2626; background: #fee2e2; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; }
+        .status-approved { color: #16a34a; background: #dcfce7; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; }
+
+        /* --- Modal & Report Popup --- */
+        .modal-overlay { 
+            background-color: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(4px);
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; 
+            justify-content: center; align-items: center; 
+        }
+        .modal-content { 
+            background: white; padding: 2rem; 
+            border-radius: 1rem;
+            max-width: 95%; width: 1150px; max-height: 90vh; overflow-y: auto; 
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .report-header { 
+            background: #1e293b; 
+            color: white; text-align: center; padding: 15px; font-weight: bold; font-size: 1.25rem; 
+            border-radius: 8px; margin-bottom: 20px;
+        }
         .report-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .report-table th, .report-table td { border: 1px solid #444; padding: 8px; text-align: center; color: #000; font-size: 0.85rem; }
-        .report-table th { background-color: #f2f2f2; font-weight: 600; }
-        .report-scb-header { background-color: #d13d6a !important; color: white !important; }
-        .report-kbank-header { background-color: #2e6b36 !important; color: white !important; }
-        .report-scb-sum { background-color: #f7c1d1; }
-        .report-kbank-sum { background-color: #d1ead4; }
-        .report-grand-sum { background-color: #f9cb9c; }
-        .btn-summary { background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%); color: white; padding: 12px 28px; border-radius: 50px; font-weight: 500; }
-        .btn-excel { background: linear-gradient(135deg, #1d6f42 0%, #2e8b57 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 500; margin-top: 15px; }
-        .loading-spinner { border: 4px solid #f3f3f3; border-top: 4px solid #ff85b3; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: inline-block; }
+        .report-table th, .report-table td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; color: #334155; font-size: 0.85rem; }
+        .report-table th { background-color: #f8fafc; font-weight: 600; color: #1e293b; }
+
+        /* สีสรุปในรายงาน (คุมโทนให้อ่อนลง) */
+        .report-scb-header { background-color: #7e22ce !important; color: white !important; }
+        .report-kbank-header { background-color: #15803d !important; color: white !important; }
+        .report-scb-sum { background-color: #faf5ff; font-weight: 600; }
+        .report-kbank-sum { background-color: #f0fdf4; font-weight: 600; }
+        .report-grand-sum { background-color: #fefce8; font-weight: 700; color: #854d0e; }
+
+        /* --- Utilities --- */
+        .loading-spinner { border: 3px solid #f1f5f9; border-top: 3px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         .storage-bar-bg { width: 80px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 3px; overflow: hidden; display: inline-block; margin-left: 8px; }
-        .storage-bar-fill { height: 100%; background: #4ade80; width: 0%; transition: width 0.5s ease; }
+        .storage-bar-fill { height: 100%; background: #22c55e; width: 0%; transition: width 0.5s ease; }
     </style>
 </head>
 
@@ -81,15 +135,21 @@
             </div>
         </div> <div class="custom-card p-6 md:p-8 rounded-b-[2.5rem]">
             <div id="entryForm" class="bg-pink-50/40 p-5 rounded-[2rem] border border-pink-100/60 mb-10">
-                <input type="hidden" id="editDocId" value="">
-                <div class="flex flex-wrap lg:flex-nowrap gap-3 items-end">
-                    <div class="w-full sm:w-24 lg:w-28">
-                        <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">สถานะ</label>
-                        <select id="statusInput" class="px-2">
-                            <option value="รออนุมัติ">รออนุมัติ</option>
-                            <option value="อนุมัติ">อนุมัติ</option>
-                        </select>
-                    </div>
+    <input type="hidden" id="editDocId" value="">
+
+    <div class="flex justify-end space-x-2 mb-4">
+        <button type="button" onclick="downloadTemplate()" class="text-[10px] bg-slate-500 text-white px-3 py-1 rounded hover:bg-slate-600 transition">📥 ดาวน์โหลดไฟล์ตัวอย่าง</button>
+        <button type="button" onclick="document.getElementById('importFile').click()" class="text-[10px] bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition">📤 นำเข้าจาก Excel</button>
+        <input type="file" id="importFile" class="hidden" accept=".xlsx" onchange="handleImport(event)">
+    </div>
+    <div class="flex flex-wrap lg:flex-nowrap gap-3 items-end">
+        <div class="w-full sm:w-24 lg:w-28">
+            <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">สถานะ</label>
+            <select id="statusInput" class="px-2">
+                <option value="รออนุมัติ">รออนุมัติ</option>
+                <option value="อนุมัติ">อนุมัติ</option>
+            </select>
+        </div>
                     <div class="w-full sm:w-36 lg:w-36">
                         <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">วันที่</label>
                         <input type="date" id="dateInput" class="px-1">
@@ -231,13 +291,24 @@
     <!-- Modal: Report Preview & Export -->
     <div id="reportModal" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-2">
-                <button id="downloadExcelBtn" onclick="exportToExcelAdvanced()" class="btn-excel">📥 ดาวน์โหลดไฟล์ Excel (สีสันเหมือนจริง)</button>
-                <button onclick="closeModalDirect()" class="text-gray-400 hover:text-red-500 text-2xl">✕</button>
-            </div>
+            
             <div class="report-header" id="modalHeaderTitle">สรุปรายการค่าใช้จ่าย บริษัท เอสดับเบิ้ลยูพี เวนเจอร์ จำกัด</div>
-            <div class="mt-4 mb-2 text-md font-semibold text-gray-800 text-center" id="modalDateDisplay"></div>
-            <div id="modalTableWrapper">
+
+            <div class="flex justify-between items-center mb-4 mt-4">
+                <div class="text-left">
+                    <div class="text-lg font-semibold text-gray-800" id="modalDateDisplay"></div>
+                </div>
+                <div class="flex space-x-2">
+                    <button id="downloadExcelBtn" onclick="exportToExcelAdvanced()" class="btn-excel" style="margin-top:0;">📥 ดาวน์โหลด Excel (สีสันเหมือนจริง)</button>
+                    <button onclick="closeModalDirect()" class="bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-500 p-2 rounded-full transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="modalTableWrapper" class="overflow-x-auto">
                 <table class="report-table" id="exportTable">
                     <thead>
                         <tr>
@@ -259,12 +330,45 @@
                             <td></td>
                         </tr>
                         <tr>
-                            <td colspan="5" class="border-none" style="border:none"></td>
+                            <td colspan="5" style="border:none"></td>
                             <td id="modalGrandTotal" class="report-grand-sum font-bold text-lg">0.00</td>
-                            <td class="border-none" style="border:none"></td>
+                            <td style="border:none"></td>
                         </tr>
                     </tfoot>
                 </table>
+            </div>
+        </div>
+    </div>
+
+<div id="importPreviewModal" class="modal-overlay" style="display:none; z-index: 100;">
+        <div class="modal-content !max-w-4xl">
+            <div class="report-header" style="background: #1e293b;">ตรวจสอบข้อมูลก่อนบันทึก (Import Preview)</div>
+            <p class="text-xs text-gray-500 mb-4">* โปรดตรวจสอบ วันที่, ชื่อ และจำนวนเงินให้ถูกต้องก่อนกดยืนยัน</p>
+            
+            <div class="overflow-x-auto max-h-[50vh]">
+                <table class="report-table w-full">
+                    <thead>
+                        <tr>
+                            <th>วันที่</th>
+                            <th>ชื่อ-นามสกุล</th>
+                            <th>รายละเอียด</th>
+                            <th>ธนาคาร</th>
+                            <th>จำนวนเงิน</th>
+                            <th>ผู้แจ้งเบิก</th>
+                        </tr>
+                    </thead>
+                    <tbody id="importPreviewBody">
+                        </tbody>
+                </table>
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-3">
+                <button id="confirmImportBtn" class="bg-green-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-green-700 transition-all">
+                    ยืนยันการบันทึกทั้งหมด
+                </button>
+                <button onclick="document.getElementById('importPreviewModal').style.display='none'" class="bg-gray-200 px-6 py-2 rounded-lg hover:bg-gray-300">
+                    ยกเลิก
+                </button>
             </div>
         </div>
     </div>
@@ -775,6 +879,117 @@ function updateNameSuggestions() {
         }
     };
 }        
+
+// --- ฟังก์ชันสำหรับระบบ Import ข้อมูล ---
+
+// 1. ดาวน์โหลดไฟล์ตัวอย่าง
+window.downloadTemplate = async function() {
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet('Template');
+    
+    // กำหนดหัวตาราง (ต้องตรงกับเงื่อนไขการอ่านไฟล์)
+    sheet.addRow(['วันที่ (ค.ศ. เช่น 2026-04-28)', 'ชื่อ-นามสกุล', 'รายละเอียด', 'ธนาคาร (SCB หรือ KBANK)', 'จำนวนเงิน', 'ผู้แจ้งเบิก']);
+    sheet.addRow(['2026-04-28', 'สมชาย ใจดี', 'เบิกค่าเดินทาง', 'SCB', 500, 'แอดมิน']);
+    
+    sheet.getColumn(1).width = 25;
+    sheet.getColumn(2).width = 20;
+    sheet.getColumn(3).width = 25;
+    
+    const buffer = await workbook.xlsx.writeBuffer();
+    saveAs(new Blob([buffer]), `Template_Import_SWP.xlsx`);
+};
+
+let pendingImportData = []; // ตัวแปรพักข้อมูลชั่วคราว
+
+// 2. อ่านไฟล์และ Preview
+window.handleImport = async function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const workbook = new ExcelJS.Workbook();
+    const reader = new FileReader();
+
+    reader.onload = async (e) => {
+        await workbook.xlsx.load(e.target.result);
+        const worksheet = workbook.getWorksheet(1);
+        pendingImportData = [];
+        const tbody = document.getElementById('importPreviewBody');
+        tbody.innerHTML = '';
+
+        worksheet.eachRow((row, rowNumber) => {
+            if (rowNumber === 1) return; // ข้ามหัวตาราง
+
+            const rowData = {
+                rawDate: row.getCell(1).text.trim(),
+                name: row.getCell(2).text.trim().replace(/^คุณ\s?/, ""),
+                reason: row.getCell(3).text.trim(),
+                bank: row.getCell(4).text.trim().toUpperCase(),
+                amount: parseFloat(row.getCell(5).value) || 0,
+                requester: row.getCell(6).text.trim() || '-'
+            };
+
+            if (rowData.name && rowData.amount > 0) {
+                pendingImportData.push(rowData);
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${rowData.rawDate}</td>
+                        <td class="text-left">${rowData.name}</td>
+                        <td class="text-left">${rowData.reason}</td>
+                        <td class="font-bold ${rowData.bank === 'SCB' ? 'text-purple-600' : 'text-green-600'}">${rowData.bank}</td>
+                        <td class="text-right font-bold">${rowData.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td>${rowData.requester}</td>
+                    </tr>
+                `;
+            }
+        });
+
+        if (pendingImportData.length > 0) {
+            document.getElementById('importPreviewModal').style.display = 'flex';
+        } else {
+            Swal.fire('ไม่พบข้อมูล', 'โปรดใช้ไฟล์ตามรูปแบบตัวอย่างครับ', 'error');
+        }
+        event.target.value = ''; // รีเซ็ต input
+    };
+    reader.readAsArrayBuffer(file);
+};
+
+// 3. กดยืนยันเพื่อบันทึกเข้า Cloud (Firebase)
+document.getElementById('confirmImportBtn').onclick = async function() {
+    if (pendingImportData.length === 0) return;
+
+    Swal.fire({
+        title: 'กำลังบันทึก...',
+        text: `กำลังนำเข้าข้อมูล ${pendingImportData.length} รายการ`,
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+    });
+
+    try {
+        // ใช้ Batch หรือการวนลูป addDoc เข้า Firebase
+        for (const item of pendingImportData) {
+            const dateObj = new Date(item.rawDate);
+            const formattedDate = dateObj.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'expenses'), {
+                status: "รออนุมัติ",
+                date: formattedDate,
+                rawDate: item.rawDate,
+                name: item.name,
+                reason: item.reason,
+                scb: item.bank === 'SCB' ? item.amount : 0,
+                kbank: item.bank === 'KBANK' ? item.amount : 0,
+                requester: item.requester,
+                updatedAt: new Date().toISOString()
+            });
+        }
+
+        await Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
+        document.getElementById('importPreviewModal').style.display = 'none';
+        fetchData(); // รีเฟรชตารางหน้าหลัก
+    } catch (err) {
+        Swal.fire('เกิดข้อผิดพลาด', err.message, 'error');
+    }
+};
     </script>
 </body>
 </html>
