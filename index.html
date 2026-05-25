@@ -7,32 +7,31 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- ExcelJS & FileSaver for Advanced Styling -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         body {
             font-family: 'IBM Plex Sans Thai', sans-serif;
-            background-color: #f8fafc; /* เปลี่ยนเป็นเทาอ่อนนวลๆ สไตล์ Dashboard */
-            background-image: none; /* เอาลายจุดออกเพื่อให้ดูสะอาดตา */
+            background-color: #f8fafc; 
+            background-image: none; 
         }
 
         /* --- Header & Card Style (Professional Indigo/Navy) --- */
         .character-gradient {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%); /* น้ำเงินเข้ม Slate */
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%); 
         }
         .custom-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border-radius: 0.75rem; /* ลดความโค้งให้ดูเป็นทางการมากขึ้น */
+            border-radius: 0.75rem; 
         }
 
         /* --- Table Styling (Main) --- */
         .table-header { background-color: #f1f5f9; border-bottom: 1px solid #cbd5e1; }
         .table-header th { color: #334155; font-weight: 600; font-size: 0.85rem; padding: 1rem 0.5rem; text-align: center; }
-        .header-scb { color: #6b21a8 !important; } /* สีม่วงเข้ม SCB */
-        .header-kbank { color: #166534 !important; } /* สีเขียวเข้ม KBANK */
+        .header-scb { color: #6b21a8 !important; } 
+        .header-kbank { color: #166534 !important; } 
         .scb-col { background-color: #fcfaff; }
         .kbank-col { background-color: #f7fee7; }
 
@@ -42,7 +41,7 @@
             padding: 8px 12px; 
             border-radius: 6px; 
             width: 100%; 
-            text-align: left; /* เปลี่ยนเป็นชิดซ้ายแบบมาตรฐาน */
+            text-align: left; 
             font-size: 0.875rem;
             transition: all 0.2s;
         }
@@ -58,18 +57,18 @@
         .btn-update { background: #0ea5e9; color: white; border-radius: 6px; }
         
         .btn-summary { 
-            background: #334155; /* ปุ่มสีเทาเข้มดูเป็นทางการ */
+            background: #334155; 
             color: white; padding: 10px 24px; border-radius: 6px; font-weight: 500; 
             transition: all 0.2s;
         }
         .btn-summary:hover { background: #1e293b; }
 
         .btn-excel { 
-            background: #059669; /* เขียว Excel มาตรฐาน */
+            background: #059669; 
             color: white; padding: 10px 20px; border-radius: 6px; font-weight: 500; margin-top: 15px; 
         }
 
-        /* --- Status Colors (ให้ความรู้สึกปลอดภัยและชัดเจน) --- */
+        /* --- Status Colors --- */
         .status-pending { color: #dc2626; background: #fee2e2; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; }
         .status-approved { color: #16a34a; background: #dcfce7; padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; }
 
@@ -97,14 +96,12 @@
         .report-table th, .report-table td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; color: #334155; font-size: 0.85rem; }
         .report-table th { background-color: #f8fafc; font-weight: 600; color: #1e293b; }
 
-        /* สีสรุปในรายงาน (คุมโทนให้อ่อนลง) */
         .report-scb-header { background-color: #7e22ce !important; color: white !important; }
         .report-kbank-header { background-color: #15803d !important; color: white !important; }
         .report-scb-sum { background-color: #faf5ff; font-weight: 600; }
         .report-kbank-sum { background-color: #f0fdf4; font-weight: 600; }
         .report-grand-sum { background-color: #fefce8; font-weight: 700; color: #854d0e; }
 
-        /* --- Utilities --- */
         .loading-spinner { border: 3px solid #f1f5f9; border-top: 3px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
@@ -123,41 +120,45 @@
                 </div>
             </div>
             
-           <div class="flex flex-col items-end space-y-2 mt-4 md:mt-0">
+            <div class="flex flex-col items-end space-y-2 mt-4 md:mt-0">
                 <div id="connectionStatus" class="px-4 py-2 bg-white/20 rounded-full text-white text-xs font-medium border border-white/10">
                     กำลังเชื่อมต่อ Cloud...
-                </div> <div id="storageIndicator" class="px-4 py-2 bg-black/10 rounded-full text-white text-[10px] flex items-center hidden">
+                </div>
+                <div id="storageIndicator" class="px-4 py-2 bg-black/10 rounded-full text-white text-[10px] flex items-center hidden">
                     <span>พื้นที่ Cloud: <span id="storagePercentText">0.00%</span></span>
                     <div class="storage-bar-bg ml-2">
                         <div id="storageBar" class="storage-bar-fill"></div>
                     </div>
                 </div>
             </div>
-        </div> <div class="custom-card p-6 md:p-8 rounded-b-[2.5rem]">
-            <div id="entryForm" class="bg-pink-50/40 p-5 rounded-[2rem] border border-pink-100/60 mb-10">
-    <input type="hidden" id="editDocId" value="">
-
-    <div class="flex justify-end space-x-2 mb-4">
-        <button type="button" onclick="downloadTemplate()" class="text-[10px] bg-slate-500 text-white px-3 py-1 rounded hover:bg-slate-600 transition">📥 ดาวน์โหลดไฟล์ตัวอย่าง</button>
-        <button type="button" onclick="document.getElementById('importFile').click()" class="text-[10px] bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition">📤 นำเข้าจาก Excel</button>
-        <input type="file" id="importFile" class="hidden" accept=".xlsx" onchange="handleImport(event)">
-    </div>
-    <div class="flex flex-wrap lg:flex-nowrap gap-3 items-end">
-        <div class="w-full sm:w-24 lg:w-28">
-            <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">สถานะ</label>
-            <select id="statusInput" class="px-2">
-                <option value="รออนุมัติ">รออนุมัติ</option>
-                <option value="อนุมัติ">อนุมัติ</option>
-            </select>
         </div>
+
+        <div class="custom-card p-6 md:p-8 rounded-b-[2.5rem]">
+            <div id="entryForm" class="bg-pink-50/40 p-5 rounded-[2rem] border border-pink-100/60 mb-10">
+                <input type="hidden" id="editDocId" value="">
+
+                <div class="flex justify-end space-x-2 mb-4">
+                    <button type="button" onclick="downloadTemplate()" class="text-[10px] bg-slate-500 text-white px-3 py-1 rounded hover:bg-slate-600 transition">📥 ดาวน์โหลดไฟล์ตัวอย่าง</button>
+                    <button type="button" onclick="document.getElementById('importFile').click()" class="text-[10px] bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition">📤 นำเข้าจาก Excel</button>
+                    <input type="file" id="importFile" class="hidden" accept=".xlsx" onchange="handleImport(event)">
+                </div>
+
+                <div class="flex flex-wrap lg:flex-nowrap gap-3 items-end">
+                    <div class="w-full sm:w-24 lg:w-28">
+                        <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">สถานะ</label>
+                        <select id="statusInput" class="px-2">
+                            <option value="รออนุมัติ">รออนุมัติ</option>
+                            <option value="อนุมัติ">อนุมัติ</option>
+                        </select>
+                    </div>
                     <div class="w-full sm:w-36 lg:w-36">
                         <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">วันที่</label>
                         <input type="date" id="dateInput" class="px-1">
                     </div>
                     <div class="w-full sm:flex-1 lg:flex-[1.2]">
                         <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">ชื่อ-นามสกุล</label>
-                       <input type="text" id="nameInput" placeholder="ระบุชื่อ" list="nameSuggestions">
-		       <datalist id="nameSuggestions"></datalist>
+                        <input type="text" id="nameInput" placeholder="ระบุชื่อ" list="nameSuggestions">
+                        <datalist id="nameSuggestions"></datalist>
                     </div>
                     <div class="w-full sm:flex-1 lg:flex-[1.2]">
                         <label class="text-[10px] font-bold text-pink-400 uppercase block mb-1 text-center">รายละเอียด</label>
@@ -192,7 +193,6 @@
                 </div>
             </div>
 
-            <!-- Table Filter -->
             <div class="flex flex-col items-center mb-8 px-2 space-y-3">
                 <h2 class="text-2xl font-bold text-gray-700 flex flex-wrap items-center justify-center gap-3">
                     <span>รายการวันที่:</span>
@@ -209,13 +209,12 @@
                 </div>
             </div>
 
-            <!-- Main Table -->
             <div class="overflow-hidden rounded-[1.5rem] border border-pink-50 shadow-sm bg-white">
                 <div class="overflow-x-auto">
                     <table class="w-full border-collapse min-w-[1000px]">
                         <thead>
                             <tr class="table-header">
-                                <th class="p-5">สถานะ</th>
+                                <th class="p-5">...</th>
                                 <th class="p-5">วันที่</th>
                                 <th class="p-5">ชื่อ-นามสกุล</th>
                                 <th class="p-5">รายละเอียด</th>
@@ -225,8 +224,7 @@
                                 <th class="p-5">จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody id="tableBody" class="divide-y divide-pink-50 text-center">
-                        </tbody>
+                        <tbody id="tableBody" class="divide-y divide-pink-50 text-center"></tbody>
                         <tfoot class="bg-pink-50/20">
                             <tr class="font-bold">
                                 <td colspan="4" class="p-6 text-right text-pink-400 italic">ยอดรวมที่แสดงในตาราง:</td>
@@ -240,6 +238,7 @@
                         </tfoot>
                     </table>
                 </div>
+
                 <div id="loadingState" class="p-20 text-center flex flex-col items-center bg-white">
                     <div class="loading-spinner mb-4"></div>
                     <p class="text-gray-400 text-sm">กำลังโหลดข้อมูลจาก Cloud...</p>
@@ -256,11 +255,13 @@
                 <button onclick="openMonthlyReportPicker()" class="btn-summary !bg-blue-600 flex items-center space-x-3">
                     <span>ดึงรายงานประจำเดือน (Monthly Report)</span>
                 </button>
+                <button onclick="openDateRangePickerModal()" class="btn-summary !bg-emerald-600 flex items-center space-x-3">
+                    <span>ดึงรายงานเป็นช่วงเวลา (Date Range Report)</span>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal: Monthly Picker -->
     <div id="monthlyPickerModal" class="modal-overlay" onclick="closeMonthlyPicker(event)">
         <div class="modal-content !max-w-md text-center" onclick="event.stopPropagation()">
             <h3 class="text-xl font-bold mb-4">เลือกเดือนและปีที่ต้องการรายงาน</h3>
@@ -288,18 +289,35 @@
         </div>
     </div>
 
-    <!-- Modal: Report Preview & Export -->
+    <div id="dateRangePickerModal" class="modal-overlay" onclick="closeDateRangePicker(event)">
+        <div class="modal-content !max-w-md text-center" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-bold mb-4">เลือกช่วงเวลาที่ต้องการรายงาน</h3>
+            <div class="grid grid-cols-2 gap-4 text-left">
+                <div>
+                    <label class="text-xs font-bold text-gray-500 block mb-1">วันที่เริ่มต้น</label>
+                    <input type="date" id="startDateInput">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500 block mb-1">วันที่สิ้นสุด</label>
+                    <input type="date" id="endDateInput">
+                </div>
+            </div>
+            <div class="mt-6 flex justify-center space-x-3">
+                <button onclick="generateDateRangePreview()" class="btn-add !bg-emerald-600 px-6 py-2 rounded-lg font-bold">แสดงตัวอย่าง</button>
+                <button onclick="closeDateRangePickerDirect()" class="bg-gray-200 px-6 py-2 rounded-lg">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
     <div id="reportModal" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            
             <div class="report-header" id="modalHeaderTitle">สรุปรายการค่าใช้จ่าย บริษัท เอสดับเบิ้ลยูพี เวนเจอร์ จำกัด</div>
-
             <div class="flex justify-between items-center mb-4 mt-4">
                 <div class="text-left">
                     <div class="text-lg font-semibold text-gray-800" id="modalDateDisplay"></div>
                 </div>
                 <div class="flex space-x-2">
-                    <button id="downloadExcelBtn" onclick="exportToExcelAdvanced()" class="btn-excel" style="margin-top:0;">📥 ดาวน์โหลด Excel (สีสันเหมือนจริง)</button>
+                    <button id="downloadExcelBtn" onclick="exportToExcelAdvanced()" class="btn-excel" style="margin-top:0;">📥 ดาวน์โหลด Excel</button>
                     <button onclick="closeModalDirect()" class="bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-500 p-2 rounded-full transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -307,44 +325,20 @@
                     </button>
                 </div>
             </div>
-
             <div id="modalTableWrapper" class="overflow-x-auto">
                 <table class="report-table" id="exportTable">
-                    <thead>
-                        <tr>
-                            <th width="10%">สถานะ</th>
-                            <th width="10%">วันที่</th>
-                            <th width="18%">ชื่อ-นามสกุล</th>
-                            <th width="18%">รายละเอียด</th>
-                            <th width="15%" class="report-scb-header">ธนาคารไทยพาณิชย์</th>
-                            <th width="15%" class="report-kbank-header">ธนาคารกสิกรไทย</th>
-                            <th width="14%">ผู้แจ้งเบิก</th>
-                        </tr>
-                    </thead>
+                    <thead id="modalTableHead"></thead>
                     <tbody id="modalTableBody"></tbody>
-                    <tfoot>
-                        <tr class="font-bold">
-                            <td colspan="4">รวม</td>
-                            <td id="modalSumSCB" class="report-scb-sum">0.00</td>
-                            <td id="modalSumKBank" class="report-kbank-sum">0.00</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td colspan="5" style="border:none"></td>
-                            <td id="modalGrandTotal" class="report-grand-sum font-bold text-lg">0.00</td>
-                            <td style="border:none"></td>
-                        </tr>
-                    </tfoot>
+                    <tfoot id="modalTableFoot"></tfoot>
                 </table>
             </div>
         </div>
     </div>
 
-<div id="importPreviewModal" class="modal-overlay" style="display:none; z-index: 100;">
+    <div id="importPreviewModal" class="modal-overlay" style="display:none; z-index: 100;">
         <div class="modal-content !max-w-4xl">
             <div class="report-header" style="background: #1e293b;">ตรวจสอบข้อมูลก่อนบันทึก (Import Preview)</div>
             <p class="text-xs text-gray-500 mb-4">* โปรดตรวจสอบ วันที่, ชื่อ และจำนวนเงินให้ถูกต้องก่อนกดยืนยัน</p>
-            
             <div class="overflow-x-auto max-h-[50vh]">
                 <table class="report-table w-full">
                     <thead>
@@ -357,29 +351,21 @@
                             <th>ผู้แจ้งเบิก</th>
                         </tr>
                     </thead>
-                    <tbody id="importPreviewBody">
-                        </tbody>
+                    <tbody id="importPreviewBody"></tbody>
                 </table>
             </div>
-
             <div class="mt-6 flex justify-end space-x-3">
-                <button id="confirmImportBtn" class="bg-green-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-green-700 transition-all">
-                    ยืนยันการบันทึกทั้งหมด
-                </button>
-                <button onclick="document.getElementById('importPreviewModal').style.display='none'" class="bg-gray-200 px-6 py-2 rounded-lg hover:bg-gray-300">
-                    ยกเลิก
-                </button>
+                <button id="confirmImportBtn" class="bg-green-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-green-700 transition-all">ยืนยันการบันทึกทั้งหมด</button>
+                <button onclick="document.getElementById('importPreviewModal').style.display='none'" class="bg-gray-200 px-6 py-2 rounded-lg hover:bg-gray-300">ยกเลิก</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, addDoc, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // 1. Firebase Configuration (ใส่ค่าของคุณ)
         const firebaseConfig = {
             apiKey: "AIzaSyDYaBSsLtSIE-gIfUKXssh_y4xS5M18vH4",
             authDomain: "swp-venture-cloud.firebaseapp.com",
@@ -390,32 +376,40 @@
             measurementId: "G-NEF8XYF3GB"
         };
 
-        // 2. ต้องมีบรรทัดพวกนี้เพื่อให้คำสั่ง Firebase ทำงานได้ (ห้ามลืมเด็ดขาด)
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = 'swp-venture-tracker'; // ชื่อโฟลเดอร์เก็บข้อมูลในฐานข้อมูล
+        const appId = 'swp-venture-tracker'; 
         
         let user = null;
         let allEntries = [];
+        let currentReportMode = 'standard'; 
+        let dateRangeActiveData = []; 
+        let currentRangeString = ''; 
+        let currentRawStartDate = '';
+        let currentRawEndDate = '';
 
-        // 3. Global functions (คงไว้เหมือนเดิม)
+        // Bind global click environments
         window.saveToCloud = saveToCloud;
         window.deleteEntry = deleteEntry;
         window.editEntry = editEntry;
         window.fetchData = fetchData;
         window.clearFilter = clearFilter;
-	window.toggleOtherReason = toggleOtherReason;
+        window.toggleOtherReason = toggleOtherReason;
         window.openDailySummary = openDailySummary;
         window.openMonthlyReportPicker = openMonthlyReportPicker;
         window.closeMonthlyPicker = closeMonthlyPicker;
         window.closeMonthlyPickerDirect = closeMonthlyPickerDirect;
         window.generateMonthlyPreview = generateMonthlyPreview;
+        window.openDateRangePickerModal = openDateRangePickerModal;
+        window.closeDateRangePicker = closeDateRangePicker;
+        window.closeDateRangePickerDirect = closeDateRangePickerDirect;
+        window.generateDateRangePreview = generateDateRangePreview;
+        window.toggleAllReceipts = toggleAllReceipts;
         window.closeModal = closeModal;
         window.closeModalDirect = closeModalDirect;
         window.exportToExcelAdvanced = exportToExcelAdvanced;
 
-        // 4. การจัดการระบบล็อคอิน
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -423,7 +417,7 @@
                 } else {
                     await signInAnonymously(auth);
                 }
-            } catch (err) { console.error("Auth error", err); }
+            } catch (err) { console.error("Auth initialization failed", err); }
         };
 
         onAuthStateChanged(auth, (u) => {
@@ -437,12 +431,8 @@
             }
         });
 
-        initAuth();
-
-      async function fetchData() {
+        async function fetchData() {
             if (!user) return;
-            
-            // แสดงสถานะกำลังโหลด
             document.getElementById('loadingState').classList.remove('hidden');
             document.getElementById('emptyState').classList.add('hidden');
             
@@ -455,54 +445,95 @@
                 const snapshot = await getDocs(colRef);
                 let data = [];
                 
-                // --- จุดที่ปรับปรุง: ดึงข้อมูลและล้างคำว่า "คุณ" ออกจากชื่อทันที ---
                 snapshot.forEach(doc => { 
                     const d = doc.data();
-                    // ตรวจสอบและตัดคำว่า "คุณ" ออกจากหน้าชื่อ
                     const cleanName = d.name ? d.name.replace(/^คุณ\s?/, "").trim() : "";
                     data.push({ id: doc.id, ...d, name: cleanName }); 
                 });
-                // -------------------------------------------------------
 
                 updateStorageUsage(data.length);
-                allEntries = data; // เก็บข้อมูลที่สะอาดแล้วลง allEntries เพื่อใช้ใน Autocomplete
+                allEntries = data; 
 
                 let displayData = [...data];
                 if (filterDate) { 
                     displayData = displayData.filter(item => item.rawDate === filterDate); 
                 }
 
-                // เรียงลำดับข้อมูล: วันที่น้อยไปมาก และเวลาบันทึกน้อยไปมาก
                 displayData.sort((a, b) => {
-                    if (a.rawDate !== b.rawDate) {
-                        return new Date(a.rawDate) - new Date(b.rawDate);
-                    }
+                    if (a.rawDate !== b.rawDate) return new Date(a.rawDate) - new Date(b.rawDate);
                     return new Date(a.updatedAt) - new Date(b.updatedAt);
                 });
 
-                // แสดงผลข้อมูลในตาราง
                 renderTable(displayData);
-                
-                // อัปเดตรายชื่อแนะนำ (Autocomplete) ให้ไม่มีคำว่า "คุณ"
                 updateNameSuggestions();
-
             } catch (err) {
-                console.error("Fetch error", err);
+                console.error("Fetch database stack failed", err);
                 alert("ไม่สามารถดึงข้อมูลจาก Cloud ได้");
             } finally {
                 document.getElementById('loadingState').classList.add('hidden');
             }
         }
 
+        // ฟังก์ชันจัดรูปแบบวันที่เป็นตัวย่อภาษาไทย เช่น "1 พ.ค. 26"
+        function formatToThaiShortDate(rawDateStr) {
+            if (!rawDateStr) return "";
+            if (rawDateStr.includes('/')) {
+                const parts = rawDateStr.split('/');
+                if (parts.length === 3) {
+                    let d = parseInt(parts[0], 10);
+                    let m = parseInt(parts[1], 10) - 1;
+                    let y = parseInt(parts[2], 10);
+                    if (y > 2500) y -= 543;
+                    const jsDate = new Date(y, m, d);
+                    if (!isNaN(jsDate.getTime())) return buildShortString(jsDate);
+                }
+            }
+            const parsedDate = new Date(rawDateStr);
+            if (isNaN(parsedDate.getTime())) return rawDateStr;
+            return buildShortString(parsedDate);
+        }
+
+        function buildShortString(dateObj) {
+            const day = dateObj.getDate();
+            const thaiShortMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+            const shortMonth = thaiShortMonths[dateObj.getMonth()];
+            const thaiYearFull = dateObj.getFullYear() + 543;
+            const shortYear = String(thaiYearFull).slice(-2);
+            return `${day} ${shortMonth} ${shortYear}`;
+        }
+
+        // ฟังก์ชันแปลงช่วงเวลาสำหรับหัวข้อตารางให้แสดงภาษาไทยเต็ม (เช่น 1-15 พฤษภาคม 2569)
+        function formatToThaiFullRange(startStr, endStr) {
+            const s = new Date(startStr);
+            const e = new Date(endStr);
+            if (isNaN(s.getTime()) || isNaN(e.getTime())) return "";
+            
+            const startDay = s.getDate();
+            const endDay = e.getDate();
+            const thaiFullMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+            const fullMonth = thaiFullMonths[e.getMonth()];
+            const fullYearBE = e.getFullYear() + 543;
+            
+            return `${startDay}-${endDay} ${fullMonth} ${fullYearBE}`;
+        }
+
+        function getFormattedRangeString(startStr, endStr) {
+            const s = new Date(startStr);
+            const e = new Date(endStr);
+            if (isNaN(s.getTime()) || isNaN(e.getTime())) return "";
+            const startDay = s.getDate();
+            const endDay = e.getDate();
+            const month = String(e.getMonth() + 1).padStart(2, '0');
+            const yearTwoDigits = String(e.getFullYear() + 543).slice(-2);
+            return `${startDay}-${endDay}.${month}.${yearTwoDigits}`;
+        }
+
         function updateStorageUsage(count) {
             const quota = 1000000; 
             const percent = (count / quota) * 100;
-            const indicator = document.getElementById('storageIndicator');
-            const text = document.getElementById('storagePercentText');
-            const bar = document.getElementById('storageBar');
-            indicator.classList.remove('hidden');
-            text.innerText = percent.toFixed(4) + "%";
-            bar.style.width = Math.max(1, percent) + "%";
+            document.getElementById('storageIndicator').classList.remove('hidden');
+            document.getElementById('storagePercentText').innerText = percent.toFixed(4) + "%";
+            document.getElementById('storageBar').style.width = Math.max(1, percent) + "%";
         }
 
         function renderTable(data) {
@@ -541,91 +572,60 @@
             document.getElementById('grandTotal').innerText = (tSCB + tKB).toLocaleString(undefined, {minimumFractionDigits: 2});
         }
 
-    async function saveToCloud() {
-    if (!user) return;
-    const docId = document.getElementById('editDocId').value;
-    const status = document.getElementById('statusInput').value;
-    const rawDate = document.getElementById('dateInput').value;
-    const bank = document.getElementById('bankInput').value;
-    const amount = parseFloat(document.getElementById('amountInput').value) || 0;
-    const requester = document.getElementById('requesterInput').value || '-';
+        async function saveToCloud() {
+            if (!user) return;
+            const docId = document.getElementById('editDocId').value;
+            const status = document.getElementById('statusInput').value;
+            const rawDate = document.getElementById('dateInput').value;
+            const bank = document.getElementById('bankInput').value;
+            const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+            const requester = document.getElementById('requesterInput').value || '-';
 
-    // ดึงชื่อและตัดคำว่า "คุณ" ออก
-    let name = document.getElementById('nameInput').value.trim();
-    name = name.replace(/^คุณ\s?/, "").trim(); 
+            let name = document.getElementById('nameInput').value.trim();
+            name = name.replace(/^คุณ\s?/, "").trim(); 
 
-    let reason = document.getElementById('reasonInput').value;
-    const otherReason = document.getElementById('otherReasonInput').value;
-    
-    if (reason === 'อื่นๆ') {
-        if (!otherReason) {
-            // --- เปลี่ยนเป็น SweetAlert2 (กรณีลืมระบุเหตุผลอื่นๆ) ---
-            Swal.fire({
-                title: 'อุ๊ย! ลืมระบุรายละเอียด',
-                text: 'กรุณาระบุรายละเอียดอื่นๆ ด้วยนะครับ',
-                icon: 'warning',
-                confirmButtonColor: '#ffafcc',
-                confirmButtonText: 'ตกลง'
-            });
-            return;
+            let reason = document.getElementById('reasonInput').value;
+            const otherReason = document.getElementById('otherReasonInput').value;
+            
+            if (reason === 'อื่นๆ') {
+                if (!otherReason) {
+                    Swal.fire({ title: 'อุ๊ย! ลืมระบุรายละเอียด', text: 'กรุณาระบุรายละเอียดอื่นๆ ด้วยนะครับ', icon: 'warning', confirmButtonColor: '#ffafcc' });
+                    return;
+                }
+                reason = otherReason;
+            }
+
+            if (!name || !reason || amount <= 0 || !rawDate) {
+                Swal.fire({ title: 'ข้อมูลไม่ครบถ้วน', text: 'ตรวจสอบ ชื่อ, เหตุผล, จำนวนเงิน และวันที่ อีกครั้งนะครับ', icon: 'info', confirmButtonColor: '#b388ff' });
+                return;
+            }
+
+            const dateObj = new Date(rawDate);
+            const formattedDate = dateObj.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const payload = { 
+                status, date: formattedDate, rawDate, name, reason, 
+                scb: bank === 'SCB' ? amount : 0, kbank: bank === 'KBANK' ? amount : 0, 
+                requester, updatedAt: new Date().toISOString() 
+            };
+
+            try {
+                if (docId) { 
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'expenses', docId), payload, { merge: true }); 
+                } else { 
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'expenses'), payload); 
+                }
+                Swal.fire({ title: 'บันทึกเรียบร้อย!', text: 'ข้อมูลถูกส่งขึ้น Cloud แล้วครับ', icon: 'success', timer: 2000, showConfirmButton: false });
+                cancelEdit(); 
+                fetchData();
+            } catch (err) { 
+                console.error("Save layer runtime crash", err); 
+            }
         }
-        reason = otherReason;
-    }
-
-    if (!name || !reason || amount <= 0 || !rawDate) {
-        // --- เปลี่ยนเป็น SweetAlert2 (กรณีกรอกข้อมูลไม่ครบ) ---
-        Swal.fire({
-            title: 'ข้อมูลไม่ครบถ้วน',
-            text: 'ตรวจสอบ ชื่อ, เหตุผล, จำนวนเงิน และวันที่ อีกครั้งนะครับ',
-            icon: 'info',
-            confirmButtonColor: '#b388ff',
-            confirmButtonText: 'เข้าใจแล้ว'
-        });
-        return;
-    }
-
-    const dateObj = new Date(rawDate);
-    const formattedDate = dateObj.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const payload = { 
-        status, date: formattedDate, rawDate, name, reason, 
-        scb: bank === 'SCB' ? amount : 0, kbank: bank === 'KBANK' ? amount : 0, 
-        requester, updatedAt: new Date().toISOString() 
-    };
-
-    try {
-        if (docId) { 
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'expenses', docId), payload, { merge: true }); 
-        } else { 
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'expenses'), payload); 
-        }
-
-        // --- เปลี่ยนเป็น SweetAlert2 (บันทึกสำเร็จ) ---
-        Swal.fire({
-            title: 'บันทึกเรียบร้อย!',
-            text: 'ข้อมูลถูกส่งขึ้น Cloud แล้วครับ',
-            icon: 'success',
-            timer: 2000, // หายไปเองใน 2 วินาที
-            showConfirmButton: false,
-            background: '#fff9fb'
-        });
-
-        cancelEdit(); 
-        fetchData();
-    } catch (err) { 
-        console.error("Save error", err); 
-        Swal.fire({
-            title: 'เกิดข้อผิดพลาด',
-            text: 'ไม่สามารถบันทึกข้อมูลได้ โปรดลองอีกครั้ง',
-            icon: 'error',
-            confirmButtonColor: '#ff4d4d'
-        });
-    }
-}
 
         async function deleteEntry(id) {
             if (!confirm("ลบข้อมูลออกจาก Cloud?")) return;
             try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'expenses', id)); fetchData(); } 
-            catch (err) { console.error("Delete error", err); }
+            catch (err) { console.error("Delete database item exception", err); }
         }
 
         function editEntry(id) {
@@ -643,7 +643,8 @@
             document.getElementById('submitBtn').classList.add('btn-update');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-	function toggleOtherReason() {
+
+        function toggleOtherReason() {
             const reasonSelect = document.getElementById('reasonInput');
             const otherInput = document.getElementById('otherReasonInput');
             if (reasonSelect && otherInput) {
@@ -655,15 +656,14 @@
                     otherInput.value = '';
                 }
             }
-        }																						
+        }
 
-        // ปรับปรุงฟังก์ชันล้างค่าเดิม (Update cancelEdit)
         function cancelEdit() {
             document.getElementById('editDocId').value = "";
             document.getElementById('submitBtn').innerText = 'บันทึก';
             document.getElementById('submitBtn').classList.remove('btn-update');
             document.getElementById('nameInput').value = '';
-            document.getElementById('reasonInput').value = 'เบิกค่าส่งพัสดุ'; // กลับไปค่าเริ่มต้น
+            document.getElementById('reasonInput').value = 'เบิกค่าส่งพัสดุ'; 
             document.getElementById('otherReasonInput').value = '';
             document.getElementById('otherReasonInput').classList.add('hidden');
             document.getElementById('amountInput').value = '';
@@ -671,37 +671,155 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('dateInput').value = today;
         }
+
         function clearFilter() { document.getElementById('filterDate').value = ''; fetchData(); }
 
         function openDailySummary() {
+            currentReportMode = 'standard';
             const fDate = document.getElementById('filterDate').value;
             let dData = fDate ? allEntries.filter(item => item.rawDate === fDate) : [...allEntries];
             populateModal(dData, fDate ? `สรุปรายการวันที่: ${new Date(fDate).toLocaleDateString('th-TH')}` : "สรุปรายการทั้งหมด");
         }
 
         window.openReportModalSingle = function(id) {
+            currentReportMode = 'standard';
             const item = allEntries.find(e => e.id === id);
             populateModal([item], `รายการวันที่: ${item.date}`);
         }
 
+        function openDateRangePickerModal() {
+            const modal = document.getElementById('dateRangePickerModal');
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDateInput').value = today;
+            document.getElementById('endDateInput').value = today;
+            modal.style.display = 'flex';
+        }
+        function closeDateRangePicker(e) { if (e.target.id === 'dateRangePickerModal') closeDateRangePickerDirect(); }
+        function closeDateRangePickerDirect() { document.getElementById('dateRangePickerModal').style.display = 'none'; }
+
+        async function generateDateRangePreview() {
+            const startStr = document.getElementById('startDateInput').value;
+            const endStr = document.getElementById('endDateInput').value;
+
+            if (!startStr || !endStr) {
+                Swal.fire('ข้อควรระวัง', 'กรุณาระบุช่วงเวลาให้ครบถ้วนครับ', 'warning');
+                return;
+            }
+
+            let rData = allEntries.filter(item => {
+                return (item.rawDate >= startStr && item.rawDate <= endStr);
+            });
+
+            rData.sort((a, b) => {
+                if (a.rawDate !== b.rawDate) return new Date(a.rawDate) - new Date(b.rawDate);
+                return new Date(a.updatedAt) - new Date(b.updatedAt);
+            });
+
+            closeDateRangePickerDirect();
+            currentReportMode = 'date-range'; 
+            dateRangeActiveData = rData;
+            currentRangeString = getFormattedRangeString(startStr, endStr);
+            currentRawStartDate = startStr;
+            currentRawEndDate = endStr;
+            
+            const startFormatted = new Date(startStr).toLocaleDateString('th-TH');
+            const endFormatted = new Date(endStr).toLocaleDateString('th-TH');
+            
+            populateModal(rData, `รายงานระหว่างวันที่ ${startFormatted} ถึง ${endFormatted}`);
+        }
+
+        function toggleAllReceipts(master) {
+            const checkboxes = document.querySelectorAll('.receipt-item-checkbox');
+            checkboxes.forEach(cb => cb.checked = master.checked);
+        }
+
         function populateModal(data, title) {
             const modal = document.getElementById('reportModal');
+            const thead = document.getElementById('modalTableHead');
             const tbody = document.getElementById('modalTableBody');
-            let tSCB = 0, tKB = 0, html = '';
-            data.forEach(item => {
-                tSCB += item.scb; tKB += item.kbank;
-                html += `<tr>
-                    <td style="${item.status === 'อนุมัติ' ? 'color: #10b981;' : 'color: #ef4444;'} font-weight: bold;">${item.status}</td>
-                    <td>${item.date}</td><td class="text-left">${item.name}</td><td class="text-left">${item.reason}</td>
-                    <td class="scb-col-excel">${item.scb > 0 ? item.scb.toLocaleString(undefined, {minimumFractionDigits: 2}) : '-'}</td>
-                    <td class="kbank-col-excel">${item.kbank > 0 ? item.kbank.toLocaleString(undefined, {minimumFractionDigits: 2}) : '-'}</td>
-                    <td>${item.requester}</td></tr>`;
-            });
-            tbody.innerHTML = html;
+            const tfoot = document.getElementById('modalTableFoot');
+            
+            tbody.innerHTML = '';
+
+            if (currentReportMode === 'date-range') {
+                thead.innerHTML = `
+                    <tr>
+                        <th width="5%"><input type="checkbox" id="masterReceiptCheckbox" onchange="toggleAllReceipts(this)" class="scale-110 cursor-pointer"></th>
+                        <th width="15%">วันที่</th>
+                        <th width="25%">ชื่อ-นามสกุล<br>ไรเดอร์</th>
+                        <th width="35%">เหตุผล</th>
+                        <th width="20%">จำนวนเงิน</th>
+                    </tr>
+                `;
+
+                let grandTotalSum = 0;
+                data.forEach((item, index) => {
+                    const totalAmt = item.scb + item.kbank;
+                    grandTotalSum += totalAmt;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><input type="checkbox" class="receipt-item-checkbox scale-110 cursor-pointer" data-index="${index}" checked></td>
+                        <td>${item.date}</td>
+                        <td class="text-left">${item.name}</td>
+                        <td class="text-left">${item.reason}</td>
+                        <td class="font-bold text-gray-800 text-right pr-6">${totalAmt.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                tfoot.innerHTML = `
+                    <tr class="font-bold bg-slate-50">
+                        <td colspan="4" class="text-right p-3">รวม</td>
+                        <td class="text-right pr-6 text-xl text-blue-600 font-bold">${grandTotalSum.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                    </tr>
+                `;
+
+                setTimeout(() => {
+                    const masterCheckbox = document.getElementById('masterReceiptCheckbox');
+                    if (masterCheckbox) masterCheckbox.checked = true;
+                }, 50);
+
+            } else {
+                thead.innerHTML = `
+                    <tr>
+                        <th width="10%">สถานะ</th>
+                        <th width="10%">วันที่</th>
+                        <th width="18%">ชื่อ-นามสกุล</th>
+                        <th width="18%">รายละเอียด</th>
+                        <th width="15%" class="report-scb-header">ธนาคารไทยพาณิชย์</th>
+                        <th width="15%" class="report-kbank-header">ธนาคารกสิกรไทย</th>
+                        <th width="14%">ผู้แจ้งเบิก</th>
+                    </tr>
+                `;
+
+                let tSCB = 0, tKB = 0;
+                data.forEach(item => {
+                    tSCB += item.scb; tKB += item.kbank;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="${item.status === 'อนุมัติ' ? 'color: #10b981;' : 'color: #ef4444;'} font-weight: bold;">${item.status}</td>
+                        <td>${item.date}</td>
+                        <td class="text-left">${item.name}</td>
+                        <td class="text-left">${item.reason}</td>
+                        <td class="scb-col-excel">${item.scb > 0 ? item.scb.toLocaleString(undefined, {minimumFractionDigits: 2}) : '-'}</td>
+                        <td class="kbank-col-excel">${item.kbank > 0 ? item.kbank.toLocaleString(undefined, {minimumFractionDigits: 2}) : '-'}</td>
+                        <td>${item.requester}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                tfoot.innerHTML = `
+                    <tr class="font-bold">
+                        <td colspan="4">รวม</td>
+                        <td class="report-scb-sum">${tSCB.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td class="report-kbank-sum">${tKB.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td></td>
+                    </tr>
+                `;
+            }
+
             document.getElementById('modalDateDisplay').innerText = title;
-            document.getElementById('modalSumSCB').innerText = tSCB.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('modalSumKBank').innerText = tKB.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('modalGrandTotal').innerText = (tSCB + tKB).toLocaleString(undefined, {minimumFractionDigits: 2});
             modal.style.display = 'flex';
         }
 
@@ -721,6 +839,7 @@
 
         function closeMonthlyPicker(e) { if (e.target.id === 'monthlyPickerModal') closeMonthlyPickerDirect(); }
         function closeMonthlyPickerDirect() { document.getElementById('monthlyPickerModal').style.display = 'none'; }
+        
         async function generateMonthlyPreview() {
             const m = parseInt(document.getElementById('monthSelect').value);
             const y = parseInt(document.getElementById('yearSelect').value);
@@ -729,267 +848,332 @@
                 return (d.getMonth() + 1 === m && d.getFullYear() === y);
             });
 
-            // --- ปรับการเรียงลำดับที่นี่ ---
             mData.sort((a, b) => {
-                if (a.rawDate !== b.rawDate) {
-                    return new Date(a.rawDate) - new Date(b.rawDate);
-                }
+                if (a.rawDate !== b.rawDate) return new Date(a.rawDate) - new Date(b.rawDate);
                 return new Date(a.updatedAt) - new Date(b.updatedAt);
             });
 
             const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
             closeMonthlyPickerDirect(); 
+            currentReportMode = 'standard'; 
             populateModal(mData, `รายงานประจำเดือน ${months[m-1]} ${y + 543}`);
         }
 
         function closeModal(e) { if (e.target.id === 'reportModal') closeModalDirect(); }
         function closeModalDirect() { document.getElementById('reportModal').style.display = 'none'; }
         
+        // ========================================================
+        // ฟังก์ชันส่งออก Excel เวอร์ชันปรับปรุงดีไซน์แมตช์ไฟล์แนบเป๊ะๆ 100%
+        // ========================================================
         async function exportToExcelAdvanced() {
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Expenses');
-            const title = document.getElementById('modalHeaderTitle').innerText;
-            const subTitle = document.getElementById('modalDateDisplay').innerText;
 
-            // 1. Add Title Rows
-            const titleRow = worksheet.addRow([title]);
-            titleRow.font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } };
-            titleRow.alignment = { horizontal: 'center' };
-            worksheet.mergeCells('A1:G1');
-            titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF777777' } };
-
-            const subTitleRow = worksheet.addRow([subTitle]);
-            subTitleRow.font = { bold: true, size: 12 };
-            subTitleRow.alignment = { horizontal: 'center' };
-            worksheet.mergeCells('A2:G2');
-
-            worksheet.addRow([]); // Blank row
-
-            // 2. Add Header Row
-            const headerRow = worksheet.addRow(["สถานะ", "วันที่", "ชื่อ-นามสกุล", "รายละเอียด", "ธนาคารไทยพาณิชย์", "ธนาคารกสิกรไทย", "ผู้แจ้งเบิก"]);
-            headerRow.eachCell((cell, colNumber) => {
-                cell.font = { bold: true };
-                cell.alignment = { horizontal: 'center', vertical: 'middle' };
-                cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
+            if (currentReportMode === 'date-range') {
+                // 1. แถวที่ 1: หัวข้อเรื่องตารางหลัก (ขนาดอักษร 16, ตัวหนา, ชิดซ้าย A1, ไม่ทำการผสานเซลล์เด็ดขาด ปล่อยโปร่งแสง)
+                const thaiFullRangeText = formatToThaiFullRange(currentRawStartDate, currentRawEndDate);
+                const mainTitleText = `ตารางเบิกเงิน สำรองจ่ายรายวัน วันที่ ${thaiFullRangeText}`;
                 
-                // Specific header colors for banks
-                if (colNumber === 5) { // SCB
-                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD13D6A' } };
-                }
-                if (colNumber === 6) { // KBANK
-                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2E6B36' } };
-                }
-            });
+                worksheet.mergeCells('A1:E1');
+                const titleCell = worksheet.getCell('A1');
+                titleCell.value = mainTitleText;
+                titleCell.font = { bold: true, size: 16, name: 'Browallia New' };
+                titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+                worksheet.getRow(1).height = 35; 
 
-            // 3. Add Data Rows
-            const tableRows = document.querySelectorAll('#modalTableBody tr');
-            tableRows.forEach(tr => {
-                const cells = tr.querySelectorAll('td');
-                const row = worksheet.addRow([
-                    cells[0].innerText,
-                    cells[1].innerText,
-                    cells[2].innerText,
-                    cells[3].innerText,
-                    cells[4].innerText === '-' ? 0 : parseFloat(cells[4].innerText.replace(/,/g, '')),
-                    cells[5].innerText === '-' ? 0 : parseFloat(cells[5].innerText.replace(/,/g, '')),
-                    cells[6].innerText
-                ]);
+                // 2. แถวที่ 2: หัวข้อคอลัมน์ (ขนาดอักษร 11, ตัวหนา, เติมสีพื้นหลังเทาอ่อน #EAEAEA, มีกรอบบางรอบเซลล์)
+                const headerRow = worksheet.addRow(["วันที่", "ชื่อ-นามสกุล", "เหตุผล", "จำนวนเงิน", "ใบเสร็จ"]);
+                worksheet.getRow(2).height = 30; 
+                
+                headerRow.eachCell((cell) => {
+                    cell.font = { bold: true, size: 11, name: 'Sarabun' };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+                    cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE2EFDA' } // สีเขียวอ่อน
+    };
+                    cell.border = {
+                        top: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        left: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        bottom: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        right: { style: 'thin', color: { argb: 'FFB0B0B0' } }
+                    };
+                });
 
-                row.eachCell((cell, colNumber) => {
-                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                    cell.alignment = { horizontal: 'center' };
+                // 3. กรอกรายการข้อมูลลงในแถวถัดไป
+                const checkboxes = document.querySelectorAll('.receipt-item-checkbox');
+                let totalAmountSum = 0;
+
+                dateRangeActiveData.forEach((item, idx) => {
+                    const combinedAmt = item.scb + item.kbank;
+                    totalAmountSum += combinedAmt;
+
+                    // เช็คสถานะติ๊กถูกจากกล่อง Checkbox หากเลือกไว้ให้แสดงผลเป็นตัวอักษร P ตัวธรรมดาตามไฟล์แนบ
+                    const isChecked = checkboxes[idx] ? checkboxes[idx].checked : true;
+                    const receiptMark = isChecked ? "P" : ""; 
+
+                    // ปรับรูปแบบวันที่ในแถวข้อมูลให้เป็นสไตล์ย่อ เช่น "1 พ.ค. 26"
+                    const thaiShortDate = formatToThaiShortDate(item.rawDate || item.date);
+
+                    const row = worksheet.addRow([
+                        thaiShortDate,
+                        item.name,
+                        item.reason,
+                        combinedAmt,
+                        receiptMark
+                    ]);
                     
-                    // Style status column
-                    if (colNumber === 1) {
-                        cell.font = { bold: true, color: { argb: cell.value === 'อนุมัติ' ? 'FF10B981' : 'FFEF4444' } };
-                    }
-                    // Style bank columns
-                    if (colNumber === 5) { // SCB
-                        cell.font = { bold: true, color: { argb: 'FF8E24AA' } };
-                        cell.numFmt = '#,##0.00';
-                    }
-                    if (colNumber === 6) { // KBANK
-                        cell.font = { bold: true, color: { argb: 'FF2E7D32' } };
-                        cell.numFmt = '#,##0.00';
+                    row.height = 28; // ปรับความสูงแถวเพื่อให้ข้อมูลขึ้นบรรทัดใหม่ได้พอดี
+
+                    row.eachCell((cell, colNumber) => {
+                        cell.border = {
+                            top: { style: 'thin', color: { argb: 'FFD9D9D9' } },
+                            left: { style: 'thin', color: { argb: 'FFD9D9D9' } },
+                            bottom: { style: 'thin', color: { argb: 'FFD9D9D9' } },
+                            right: { style: 'thin', color: { argb: 'FFD9D9D9' } }
+                        };
+                        
+                        // [ข้อ 3] คอลัมน์ที่ 1-4 (วันที่, ชื่อ, รายละเอียด, จำนวนเงิน)
+                        if (colNumber >= 1 && colNumber <= 4) {
+                            // ใช้ฟอนต์ Browallia New ขนาด 14 และไม่ใช่ตัวหนา
+                            cell.font = { name: 'Browallia New', size: 14, bold: false };
+                            
+                            // [ข้อ 2] คอลัมน์ชื่อ (2) และรายละเอียด (3) ให้ข้อมูลขึ้นบรรทัดใหม่ (wrapText)
+                            if (colNumber === 2 || colNumber === 3) {
+                                cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+                            } else {
+                                // คอลัมน์อื่นๆ จัดกึ่งกลางปกติ
+                                cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                            }
+
+                            if (colNumber === 4) {
+    cell.numFmt = '#,##0';                        // จัดรูปแบบตัวเลข
+    cell.alignment = { horizontal: 'right', vertical: 'middle' }; // สั่งให้ชิดขวา
+}
+                        }
+                        // [ข้อ 1] คอลัมน์ที่ 5 (ช่องใบเสร็จ)
+                        else if (colNumber === 5) {
+                            // ใช้ฟอนต์ Wingdings 2 ขนาด 14 และไม่ใช่ตัวหนา
+                            cell.font = { name: 'Wingdings 2', size: 14, bold: false };
+                            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                        }
+                    });
+                });
+
+                // 4. แถวสรุปยอดรวมท้ายตาราง
+                const footerRow = worksheet.addRow(["รวม", "", "", totalAmountSum, ""]);
+                footerRow.height = 26; // ขยับความสูงขึ้นเล็กน้อยเพื่อให้เข้ากับขนาดฟอนต์ 14
+                worksheet.mergeCells(`A${footerRow.number}:C${footerRow.number}`);
+                
+                footerRow.eachCell((cell, colNumber) => {
+                    // เปลี่ยนฟอนต์เป็น Browallia New ขนาด 14 ตัวหนา ตามเงื่อนไขใหม่
+                    cell.font = { bold: true, size: 14, name: 'Browallia New' };
+                    cell.border = {
+                        top: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        left: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        bottom: { style: 'thin', color: { argb: 'FFB0B0B0' } },
+                        right: { style: 'thin', color: { argb: 'FFB0B0B0' } }
+                    };
+                    
+                    // ปรับตำแหน่งทุกช่อง (คำว่ารวม, จำนวนเงิน และช่องอื่นๆ) ให้อยู่กึ่งกลางทั้งหมดตามเงื่อนไขใหม่
+                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                    
+                    // คงสถานะ Format ตัวเลขคอมม่าของช่องจำนวนเงิน (คอลัมน์ที่ 4) เอาไว้เหมือนเดิมไม่ให้พัง
+                    if (colNumber === 4) {
+                        cell.numFmt = '#,##0';
                     }
                 });
-            });
 
-            // 4. Add Summary Rows
-            const sumSCB = parseFloat(document.getElementById('modalSumSCB').innerText.replace(/,/g, ''));
-            const sumKBank = parseFloat(document.getElementById('modalSumKBank').innerText.replace(/,/g, ''));
-            const grandTotal = parseFloat(document.getElementById('modalGrandTotal').innerText.replace(/,/g, ''));
+                // จัดสัดส่วนระยะขนาดความกว้างของคอลัมน์ใน Excel ให้ลงล็อกสวยงามไม่ถูกบีบ
+                worksheet.getColumn(1).width = 14;
+                worksheet.getColumn(2).width = 24;
+                worksheet.getColumn(3).width = 42;
+                worksheet.getColumn(4).width = 16;
+                worksheet.getColumn(5).width = 10;
 
-            const footerSumRow = worksheet.addRow(["รวม", "", "", "", sumSCB, sumKBank, ""]);
-            footerSumRow.font = { bold: true };
-            footerSumRow.eachCell((cell, colNumber) => {
-                cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                cell.alignment = { horizontal: 'center' };
-                if (colNumber === 5) {
-                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF7C1D1' } };
-                    cell.numFmt = '#,##0.00';
-                }
-                if (colNumber === 6) {
-                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1EAD4' } };
-                    cell.numFmt = '#,##0.00';
-                }
-            });
+                const fileNameStr = `รายวัน.xlsx - ${currentRangeString}.xlsx`;
+                const buffer = await workbook.xlsx.writeBuffer();
+                saveAs(new Blob([buffer]), fileNameStr);
 
-            const grandRow = worksheet.addRow(["", "", "", "", "ยอดรวมสุทธิ", grandTotal, ""]);
-            grandRow.getCell(6).font = { bold: true, size: 14 };
-            grandRow.getCell(6).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF9CB9C' } };
-            grandRow.getCell(6).numFmt = '#,##0.00';
-            grandRow.getCell(6).border = { top: {style:'medium'}, left: {style:'medium'}, bottom: {style:'medium'}, right: {style:'medium'} };
-            grandRow.getCell(5).font = { bold: true };
+            } else {
+                // ========================================================
+                // โหมดมาตรฐานอื่นๆ (คงเอกลักษณ์ของตัวระบบเดิมเพื่อความปลอดภัยสูงสุด)
+                // ========================================================
+                const titleText = document.getElementById('modalHeaderTitle').innerText;
+                const subTitleText = document.getElementById('modalDateDisplay').innerText;
 
-            // Set Column Widths
-            worksheet.getColumn(1).width = 12;
-            worksheet.getColumn(1).width = 12;
-            worksheet.getColumn(2).width = 15;
-            worksheet.getColumn(3).width = 25;
-            worksheet.getColumn(4).width = 30;
-            worksheet.getColumn(5).width = 20;
-            worksheet.getColumn(6).width = 20;
-            worksheet.getColumn(7).width = 15;
+                const titleRow = worksheet.addRow([titleText]);
+                titleRow.font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } };
+                titleRow.alignment = { horizontal: 'center' };
+                worksheet.mergeCells('A1:G1');
+                titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF777777' } };
 
-// เขียนไฟล์และดาวน์โหลด
-          const buffer = await workbook.xlsx.writeBuffer();
-            saveAs(new Blob([buffer]), `${subTitle}.xlsx`);
+                const subTitleRow = worksheet.addRow([subTitleText]);
+                subTitleRow.font = { bold: true, size: 12 };
+                subTitleRow.alignment = { horizontal: 'center' };
+                worksheet.mergeCells('A2:G2');
 
-        } // ปิดฟังก์ชัน exportToExcelAdvanced
+                worksheet.addRow([]); 
 
-        // --- เริ่มทำงานครั้งแรกเมื่อโหลดหน้าเว็บ ---
-        initAuth();  // เชื่อมต่อระบบ Cloud
-        fetchData(); // ดึงข้อมูลมาแสดงครั้งแรก
-function updateNameSuggestions() {
-    const nameInput = document.getElementById('nameInput'); // หาช่องกรอกชื่อ
-    const datalist = document.getElementById('nameSuggestions');
-    
-    nameInput.oninput = function() {
-        const val = this.value.trim();
-        // แก้ตรงนี้: ถ้าพิมพ์มากกว่าหรือเท่ากับ 1 ตัวอักษรค่อยแสดงรายชื่อ
-        if (val.length >= 1) { 
-            const uniqueNames = [...new Set(allEntries.map(item => item.name))];
-            datalist.innerHTML = uniqueNames.map(name => `<option value="${name}">`).join('');
-        } else {
-            datalist.innerHTML = ''; // ถ้าว่างเปล่าให้ล้างรายการทิ้ง
-        }
-    };
-}        
+                const headerRow = worksheet.addRow(["สถานะ", "วันที่", "ชื่อ-นามสกุล", "รายละเอียด", "ธนาคารไทยพาณิชย์", "ธนาคารกสิกรไทย", "ผู้แจ้งเบิก"]);
+                headerRow.eachCell((cell, colNumber) => {
+                    cell.font = { bold: true };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' } };
+                    if (colNumber === 5) {
+                        cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD13D6A' } };
+                    }
+                    if (colNumber === 6) {
+                        cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2E6B36' } };
+                    }
+                });
 
-// --- ฟังก์ชันสำหรับระบบ Import ข้อมูล ---
+                const tableRows = document.querySelectorAll('#modalTableBody tr');
+                let sumSCB = 0, sumKBank = 0;
+                tableRows.forEach(tr => {
+                    const cells = tr.querySelectorAll('td');
+                    if(cells.length < 7) return;
+                    const valSCB = cells[4].innerText === '-' ? 0 : parseFloat(cells[4].innerText.replace(/,/g, ''));
+                    const valKBank = cells[5].innerText === '-' ? 0 : parseFloat(cells[5].innerText.replace(/,/g, ''));
+                    sumSCB += valSCB;
+                    sumKBank += valKBank;
 
-// 1. ดาวน์โหลดไฟล์ตัวอย่าง
-window.downloadTemplate = async function() {
-    const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet('Template');
-    
-    // กำหนดหัวตาราง (ต้องตรงกับเงื่อนไขการอ่านไฟล์)
-    sheet.addRow(['วันที่ (ค.ศ. เช่น 2026-04-28)', 'ชื่อ-นามสกุล', 'รายละเอียด', 'ธนาคาร (SCB หรือ KBANK)', 'จำนวนเงิน', 'ผู้แจ้งเบิก']);
-    sheet.addRow(['2026-04-28', 'สมชาย ใจดี', 'เบิกค่าเดินทาง', 'SCB', 500, 'แอดมิน']);
-    
-    sheet.getColumn(1).width = 25;
-    sheet.getColumn(2).width = 20;
-    sheet.getColumn(3).width = 25;
-    
-    const buffer = await workbook.xlsx.writeBuffer();
-    saveAs(new Blob([buffer]), `Template_Import_SWP.xlsx`);
-};
+                    const rowThaiShortDate = formatToThaiShortDate(cells[1].innerText);
 
-let pendingImportData = []; // ตัวแปรพักข้อมูลชั่วคราว
+                    const row = worksheet.addRow([
+                        cells[0].innerText, rowThaiShortDate, cells[2].innerText, cells[3].innerText, valSCB, valKBank, cells[6].innerText
+                    ]);
 
-// 2. อ่านไฟล์และ Preview
-window.handleImport = async function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+                    row.eachCell((cell, colNumber) => {
+                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                        cell.alignment = { horizontal: 'center' };
+                        if (colNumber === 1) cell.font = { bold: true, color: { argb: cell.value === 'อนุมัติ' ? 'FF10B981' : 'FFEF4444' } };
+                        if (colNumber === 5 || colNumber === 6) { cell.font = { bold: true }; cell.numFmt = '#,##0.00'; }
+                    });
+                });
 
-    const workbook = new ExcelJS.Workbook();
-    const reader = new FileReader();
+                const footerSumRow = worksheet.addRow(["รวม", "", "", "", sumSCB, sumKBank, ""]);
+                footerSumRow.font = { bold: true };
+                footerSumRow.eachCell((cell, colNumber) => {
+                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                    cell.alignment = { horizontal: 'center' };
+                    if (colNumber === 5) { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF7C1D1' } }; cell.numFmt = '#,##0.00'; }
+                    if (colNumber === 6) { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1EAD4' } }; cell.numFmt = '#,##0.00'; }
+                });
 
-    reader.onload = async (e) => {
-        await workbook.xlsx.load(e.target.result);
-        const worksheet = workbook.getWorksheet(1);
-        pendingImportData = [];
-        const tbody = document.getElementById('importPreviewBody');
-        tbody.innerHTML = '';
+                worksheet.getColumn(1).width = 12;
+                worksheet.getColumn(2).width = 15;
+                worksheet.getColumn(3).width = 25;
+                worksheet.getColumn(4).width = 30;
+                worksheet.getColumn(5).width = 20;
+                worksheet.getColumn(6).width = 20;
+                worksheet.getColumn(7).width = 15;
 
-        worksheet.eachRow((row, rowNumber) => {
-            if (rowNumber === 1) return; // ข้ามหัวตาราง
-
-            const rowData = {
-                rawDate: row.getCell(1).text.trim(),
-                name: row.getCell(2).text.trim().replace(/^คุณ\s?/, ""),
-                reason: row.getCell(3).text.trim(),
-                bank: row.getCell(4).text.trim().toUpperCase(),
-                amount: parseFloat(row.getCell(5).value) || 0,
-                requester: row.getCell(6).text.trim() || '-'
-            };
-
-            if (rowData.name && rowData.amount > 0) {
-                pendingImportData.push(rowData);
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${rowData.rawDate}</td>
-                        <td class="text-left">${rowData.name}</td>
-                        <td class="text-left">${rowData.reason}</td>
-                        <td class="font-bold ${rowData.bank === 'SCB' ? 'text-purple-600' : 'text-green-600'}">${rowData.bank}</td>
-                        <td class="text-right font-bold">${rowData.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-                        <td>${rowData.requester}</td>
-                    </tr>
-                `;
+                const buffer = await workbook.xlsx.writeBuffer();
+                saveAs(new Blob([buffer]), `${subTitleText}.xlsx`);
             }
-        });
-
-        if (pendingImportData.length > 0) {
-            document.getElementById('importPreviewModal').style.display = 'flex';
-        } else {
-            Swal.fire('ไม่พบข้อมูล', 'โปรดใช้ไฟล์ตามรูปแบบตัวอย่างครับ', 'error');
-        }
-        event.target.value = ''; // รีเซ็ต input
-    };
-    reader.readAsArrayBuffer(file);
-};
-
-// 3. กดยืนยันเพื่อบันทึกเข้า Cloud (Firebase)
-document.getElementById('confirmImportBtn').onclick = async function() {
-    if (pendingImportData.length === 0) return;
-
-    Swal.fire({
-        title: 'กำลังบันทึก...',
-        text: `กำลังนำเข้าข้อมูล ${pendingImportData.length} รายการ`,
-        allowOutsideClick: false,
-        didOpen: () => { Swal.showLoading(); }
-    });
-
-    try {
-        // ใช้ Batch หรือการวนลูป addDoc เข้า Firebase
-        for (const item of pendingImportData) {
-            const dateObj = new Date(item.rawDate);
-            const formattedDate = dateObj.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'expenses'), {
-                status: "รออนุมัติ",
-                date: formattedDate,
-                rawDate: item.rawDate,
-                name: item.name,
-                reason: item.reason,
-                scb: item.bank === 'SCB' ? item.amount : 0,
-                kbank: item.bank === 'KBANK' ? item.amount : 0,
-                requester: item.requester,
-                updatedAt: new Date().toISOString()
-            });
         }
 
-        await Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
-        document.getElementById('importPreviewModal').style.display = 'none';
-        fetchData(); // รีเฟรชตารางหน้าหลัก
-    } catch (err) {
-        Swal.fire('เกิดข้อผิดพลาด', err.message, 'error');
-    }
-};
+        initAuth();  
+        fetchData(); 
+
+        function updateNameSuggestions() {
+            const nameInput = document.getElementById('nameInput'); 
+            const datalist = document.getElementById('nameSuggestions');
+            if(!nameInput) return;
+            nameInput.oninput = function() {
+                const val = this.value.trim();
+                if (val.length >= 1) { 
+                    const uniqueNames = [...new Set(allEntries.map(item => item.name))];
+                    datalist.innerHTML = uniqueNames.map(name => `<option value="${name}">`).join('');
+                } else {
+                    datalist.innerHTML = '';
+                }
+            };
+        }        
+
+        window.downloadTemplate = async function() {
+            const workbook = new ExcelJS.Workbook();
+            const sheet = workbook.addWorksheet('Template');
+            sheet.addRow(['วันที่ (ค.ศ. เช่น 2026-05-15)', 'ชื่อ-นามสกุล', 'รายละเอียด', 'ธนาคาร (SCB หรือ KBANK)', 'จำนวนเงิน', 'ผู้แจ้งเบิก']);
+            sheet.addRow(['2026-05-15', 'สมชาย ใจดี', 'เบิกค่าส่งพัสดุ', 'SCB', 500, 'แอดมิน']);
+            sheet.getColumn(1).width = 25;
+            sheet.getColumn(2).width = 20;
+            sheet.getColumn(3).width = 25;
+            const buffer = await workbook.xlsx.writeBuffer();
+            saveAs(new Blob([buffer]), `Template_Import_SWP.xlsx`);
+        };
+
+        window.handleImport = async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const workbook = new ExcelJS.Workbook();
+            const reader = new FileReader();
+
+            reader.onload = async (e) => {
+                await workbook.xlsx.load(e.target.result);
+                const worksheet = workbook.getWorksheet(1);
+                pendingImportData = [];
+                const tbody = document.getElementById('importPreviewBody');
+                tbody.innerHTML = '';
+
+                worksheet.eachRow((row, rowNumber) => {
+                    if (rowNumber === 1) return; 
+                    const rowData = {
+                        rawDate: row.getCell(1).text.trim(),
+                        name: row.getCell(2).text.trim().replace(/^คุณ\s?/, ""),
+                        reason: row.getCell(3).text.trim(),
+                        bank: row.getCell(4).text.trim().toUpperCase(),
+                        amount: parseFloat(row.getCell(5).value) || 0,
+                        requester: row.getCell(6).text.trim() || '-'
+                    };
+                    if (rowData.name && rowData.amount > 0) {
+                        pendingImportData.push(rowData);
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${rowData.rawDate}</td>
+                                <td class="text-left">${rowData.name}</td>
+                                <td class="text-left">${rowData.reason}</td>
+                                <td class="font-bold ${rowData.bank === 'SCB' ? 'text-purple-600' : 'text-green-600'}">${rowData.bank}</td>
+                                <td class="text-right font-bold">${rowData.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                                <td>${rowData.requester}</td>
+                            </tr>
+                        `;
+                    }
+                });
+                if (pendingImportData.length > 0) {
+                    document.getElementById('importPreviewModal').style.display = 'flex';
+                } else {
+                    Swal.fire('ไม่พบข้อมูล', 'โปรดใช้ไฟล์ตามรูปแบบตัวอย่างครับ', 'error');
+                }
+                event.target.value = ''; 
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        let pendingImportData = [];
+        document.getElementById('confirmImportBtn').onclick = async function() {
+            if (pendingImportData.length === 0) return;
+            Swal.fire({ title: 'กำลังบันทึก...', text: `กำลังนำเข้าข้อมูล ${pendingImportData.length} รายการ`, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            try {
+                for (const item of pendingImportData) {
+                    const dateObj = new Date(item.rawDate);
+                    const formattedDate = dateObj.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'expenses'), {
+                        status: "รออนุมัติ", date: formattedDate, rawDate: item.rawDate, name: item.name, reason: item.reason,
+                        scb: item.bank === 'SCB' ? item.amount : 0, kbank: item.bank === 'KBANK' ? item.amount : 0,
+                        requester: item.requester, updatedAt: new Date().toISOString()
+                    });
+                }
+                await Swal.fire('สำเร็จ!', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
+                document.getElementById('importPreviewModal').style.display = 'none';
+                fetchData(); 
+            } catch (err) { Swal.fire('เกิดข้อผิดพลาด', err.message, 'error'); }
+        };
     </script>
 </body>
 </html>
