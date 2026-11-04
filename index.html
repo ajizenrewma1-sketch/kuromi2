@@ -311,7 +311,17 @@
 
     <div id="reportModal" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="report-header" id="modalHeaderTitle">สรุปรายการค่าใช้จ่าย บริษัท เอสดับเบิ้ลยูพี เวนเจอร์ จำกัด</div>
+            <!-- หัวข้อรายงานที่มีการเลือกชื่อบริษัท และปรับเปลี่ยนไดนามิกซิงค์ผ่าน Cloud -->
+            <div class="report-header flex flex-wrap justify-center items-center gap-2" id="modalHeaderTitle">
+                <span>สรุปรายการค่าใช้จ่าย</span>
+                <div class="inline-flex items-center space-x-1">
+                    <select id="companySelect" onchange="onCompanyChange()" class="bg-slate-800 text-white font-bold text-lg border border-slate-600 rounded px-3 py-1 cursor-pointer focus:ring-0">
+                    </select>
+                    <button onclick="promptAddCompany()" title="เพิ่มบริษัทใหม่" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-sm transition">➕</button>
+                    <button onclick="confirmRemoveCompany()" title="ลบบริษัทที่เลือก" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm transition">🗑️</button>
+                </div>
+            </div>
+
             <div class="flex justify-between items-center mb-4 mt-4">
                 <div class="text-left">
                     <div class="text-lg font-semibold text-gray-800" id="modalDateDisplay"></div>
@@ -364,7 +374,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, addDoc, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDYaBSsLtSIE-gIfUKXssh_y4xS5M18vH4",
@@ -388,6 +398,123 @@
         let currentRangeString = ''; 
         let currentRawStartDate = '';
         let currentRawEndDate = '';
+
+        // --- เพิ่มเติม: ระบบจัดการตัวเลือกชื่อบริษัทและการจดจำค่าบน Cloud (Firestore) ---
+        const DEFAULT_COMPANIES = ["บริษัท เอสดับเบิ้ลยูพี เวนเจอร์ จำกัด"];
+        let companyList = [...DEFAULT_COMPANIES];
+        let selectedCompany = DEFAULT_COMPANIES[0];
+
+        async function fetchCompanySettingsFromCloud() {
+            try {
+                const settingsRef = doc(db, 'artifacts', appId, 'public', 'config', 'company_settings');
+                const snap = await getDoc(settingsRef);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (data.companyList && Array.isArray(data.companyList) && data.companyList.length > 0) {
+                        companyList = data.companyList;
+                    }
+                    if (data.selectedCompany && companyList.includes(data.selectedCompany)) {
+                        selectedCompany = data.selectedCompany;
+                    } else {
+                        selectedCompany = companyList[0];
+                    }
+                } else {
+                    // หากยังไม่มีการตั้งค่าบน Cloud ให้สร้างค่าเริ่มต้นขึ้นไปเก็บไว้ทันที
+                    await setDoc(settingsRef, { companyList, selectedCompany }, { merge: true });
+                }
+            } catch (err) {
+                console.error("Failed to load company settings from cloud", err);
+            }
+            initCompanyDropdown();
+        }
+
+        async function saveCompanySettingsToCloud() {
+            try {
+                const settingsRef = doc(db, 'artifacts', appId, 'public', 'config', 'company_settings');
+                await setDoc(settingsRef, { companyList, selectedCompany }, { merge: true });
+            } catch (err) {
+                console.error("Failed to save company settings to cloud", err);
+            }
+        }
+
+        function initCompanyDropdown() {
+            const selectEl = document.getElementById('companySelect');
+            if (!selectEl) return;
+            selectEl.innerHTML = '';
+            
+            if (!companyList.includes(selectedCompany)) {
+                selectedCompany = companyList[0] || DEFAULT_COMPANIES[0];
+            }
+
+            companyList.forEach(comp => {
+                const opt = document.createElement('option');
+                opt.value = comp;
+                opt.innerText = comp;
+                if (comp === selectedCompany) opt.selected = true;
+                selectEl.appendChild(opt);
+            });
+        }
+
+        window.onCompanyChange = async function() {
+            const selectEl = document.getElementById('companySelect');
+            selectedCompany = selectEl.value;
+            await saveCompanySettingsToCloud();
+        };
+
+        window.promptAddCompany = async function() {
+            const { value: newCompany } = await Swal.fire({
+                title: 'เพิ่มชื่อบริษัทใหม่',
+                input: 'text',
+                inputLabel: 'ระบุชื่อบริษัทที่ต้องการแสดงในหัวรายงาน',
+                inputPlaceholder: 'เช่น บริษัท ตัวอย่าง จำกัด',
+                showCancelButton: true,
+                confirmButtonText: 'บันทึก',
+                cancelButtonText: 'ยกเลิก',
+                inputValidator: (value) => {
+                    if (!value || !value.trim()) {
+                        return 'กรุณาระบุชื่อบริษัท!';
+                    }
+                }
+            });
+
+            if (newCompany) {
+                const trimmed = newCompany.trim();
+                if (!companyList.includes(trimmed)) {
+                    companyList.push(trimmed);
+                    selectedCompany = trimmed;
+                    await saveCompanySettingsToCloud();
+                    initCompanyDropdown();
+                    Swal.fire({ title: 'เพิ่มและซิงค์ขึ้น Cloud สำเร็จ!', icon: 'success', timer: 1500, showConfirmButton: false });
+                } else {
+                    Swal.fire('ข้อผิดพลาด', 'มีชื่อบริษัทนี้อยู่ในระบบแล้ว', 'warning');
+                }
+            }
+        };
+
+        window.confirmRemoveCompany = async function() {
+            if (companyList.length <= 1) {
+                Swal.fire('ไม่สามารถลบได้', 'ต้องมีชื่อบริษัทอย่างน้อย 1 ชื่อในระบบ', 'warning');
+                return;
+            }
+
+            const res = await Swal.fire({
+                title: 'ยืนยันการลบ?',
+                text: `คุณต้องการลบ "${selectedCompany}" ออกจากตัวเลือกใช่หรือไม่?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'ใช่, ลบออก',
+                cancelButtonText: 'ยกเลิก'
+            });
+
+            if (res.isConfirmed) {
+                companyList = companyList.filter(c => c !== selectedCompany);
+                selectedCompany = companyList[0];
+                await saveCompanySettingsToCloud();
+                initCompanyDropdown();
+                Swal.fire({ title: 'ลบและอัปเดตบน Cloud เรียบร้อย!', icon: 'success', timer: 1500, showConfirmButton: false });
+            }
+        };
 
         // Bind global click environments
         window.saveToCloud = saveToCloud;
@@ -420,13 +547,14 @@
             } catch (err) { console.error("Auth initialization failed", err); }
         };
 
-        onAuthStateChanged(auth, (u) => {
+        onAuthStateChanged(auth, async (u) => {
             user = u;
             if (user) {
                 document.getElementById('connectionStatus').innerHTML = "🟢 เชื่อมต่อ Cloud สำเร็จ";
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('dateInput').value = today;
                 document.getElementById('filterDate').value = today;
+                await fetchCompanySettingsFromCloud(); // โหลดการตั้งค่าบริษัทจาก Cloud ทันทีที่เชื่อมต่อสำเร็จ
                 fetchData();
             }
         });
@@ -674,15 +802,17 @@
 
         function clearFilter() { document.getElementById('filterDate').value = ''; fetchData(); }
 
-        function openDailySummary() {
+        async function openDailySummary() {
             currentReportMode = 'standard';
+            await fetchCompanySettingsFromCloud(); // อัปเดตข้อมูลบริษัทล่าสุดจาก Cloud ก่อนเปิด Modal
             const fDate = document.getElementById('filterDate').value;
             let dData = fDate ? allEntries.filter(item => item.rawDate === fDate) : [...allEntries];
             populateModal(dData, fDate ? `สรุปรายการวันที่: ${new Date(fDate).toLocaleDateString('th-TH')}` : "สรุปรายการทั้งหมด");
         }
 
-        window.openReportModalSingle = function(id) {
+        window.openReportModalSingle = async function(id) {
             currentReportMode = 'standard';
+            await fetchCompanySettingsFromCloud();
             const item = allEntries.find(e => e.id === id);
             populateModal([item], `รายการวันที่: ${item.date}`);
         }
@@ -725,6 +855,7 @@
             const startFormatted = new Date(startStr).toLocaleDateString('th-TH');
             const endFormatted = new Date(endStr).toLocaleDateString('th-TH');
             
+            await fetchCompanySettingsFromCloud();
             populateModal(rData, `รายงานระหว่างวันที่ ${startFormatted} ถึง ${endFormatted}`);
         }
 
@@ -739,6 +870,8 @@
             const tbody = document.getElementById('modalTableBody');
             const tfoot = document.getElementById('modalTableFoot');
             
+            initCompanyDropdown();
+
             tbody.innerHTML = '';
 
             if (currentReportMode === 'date-range') {
@@ -823,7 +956,8 @@
             modal.style.display = 'flex';
         }
 
-        function openMonthlyReportPicker() {
+        async function openMonthlyReportPicker() {
+            await fetchCompanySettingsFromCloud();
             const modal = document.getElementById('monthlyPickerModal');
             const yearSelect = document.getElementById('yearSelect');
             const curY = new Date().getFullYear();
@@ -889,10 +1023,10 @@
                     cell.font = { bold: true, size: 11, name: 'Sarabun' };
                     cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
                     cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFE2EFDA' } // สีเขียวอ่อน
-    };
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'FFE2EFDA' } // สีเขียวอ่อน
+                    };
                     cell.border = {
                         top: { style: 'thin', color: { argb: 'FFB0B0B0' } },
                         left: { style: 'thin', color: { argb: 'FFB0B0B0' } },
@@ -948,9 +1082,9 @@
                             }
 
                             if (colNumber === 4) {
-    cell.numFmt = '#,##0';                        // จัดรูปแบบตัวเลข
-    cell.alignment = { horizontal: 'right', vertical: 'middle' }; // สั่งให้ชิดขวา
-}
+                                cell.numFmt = '#,##0';                        // จัดรูปแบบตัวเลข
+                                cell.alignment = { horizontal: 'right', vertical: 'middle' }; // สั่งให้ชิดขวา
+                            }
                         }
                         // [ข้อ 1] คอลัมน์ที่ 5 (ช่องใบเสร็จ)
                         else if (colNumber === 5) {
@@ -1000,7 +1134,7 @@
                 // ========================================================
                 // โหมดมาตรฐานอื่นๆ (คงเอกลักษณ์ของตัวระบบเดิมเพื่อความปลอดภัยสูงสุด)
                 // ========================================================
-                const titleText = document.getElementById('modalHeaderTitle').innerText;
+                const titleText = `สรุปรายการค่าใช้จ่าย ${selectedCompany}`;
                 const subTitleText = document.getElementById('modalDateDisplay').innerText;
 
                 const titleRow = worksheet.addRow([titleText]);
