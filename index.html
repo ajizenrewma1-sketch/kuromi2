@@ -311,7 +311,7 @@
 
     <div id="reportModal" class="modal-overlay" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <!-- หัวข้อรายงานที่มีการเลือกชื่อบริษัท และปรับเปลี่ยนไดนามิกซิงค์ผ่าน Cloud -->
+            <!-- หัวข้อรายงานที่มีการเลือกชื่อบริษัท และซิงค์ข้อมูลผ่าน Cloud ที่ถูกต้องตามหลัก Firestore -->
             <div class="report-header flex flex-wrap justify-center items-center gap-2" id="modalHeaderTitle">
                 <span>สรุปรายการค่าใช้จ่าย</span>
                 <div class="inline-flex items-center space-x-1">
@@ -399,14 +399,15 @@
         let currentRawStartDate = '';
         let currentRawEndDate = '';
 
-        // --- เพิ่มเติม: ระบบจัดการตัวเลือกชื่อบริษัทและการจดจำค่าบน Cloud (Firestore) ---
+        // --- ระบบซิงค์ข้อมูลบริษัทผ่าน Cloud (แก้ไข Path ให้ถูกต้องตามกฎของ Firestore) ---
         const DEFAULT_COMPANIES = ["บริษัท เอสดับเบิ้ลยูพี เวนเจอร์ จำกัด"];
         let companyList = [...DEFAULT_COMPANIES];
         let selectedCompany = DEFAULT_COMPANIES[0];
 
         async function fetchCompanySettingsFromCloud() {
             try {
-                const settingsRef = doc(db, 'artifacts', appId, 'public', 'config', 'company_settings');
+                // แก้ไข Path ให้มีจำนวน Segment เป็นเลขคู่ (artifacts -> swp-venture-tracker -> configs -> company_settings)
+                const settingsRef = doc(db, 'artifacts', appId, 'configs', 'company_settings');
                 const snap = await getDoc(settingsRef);
                 if (snap.exists()) {
                     const data = snap.data();
@@ -419,7 +420,6 @@
                         selectedCompany = companyList[0];
                     }
                 } else {
-                    // หากยังไม่มีการตั้งค่าบน Cloud ให้สร้างค่าเริ่มต้นขึ้นไปเก็บไว้ทันที
                     await setDoc(settingsRef, { companyList, selectedCompany }, { merge: true });
                 }
             } catch (err) {
@@ -430,7 +430,7 @@
 
         async function saveCompanySettingsToCloud() {
             try {
-                const settingsRef = doc(db, 'artifacts', appId, 'public', 'config', 'company_settings');
+                const settingsRef = doc(db, 'artifacts', appId, 'configs', 'company_settings');
                 await setDoc(settingsRef, { companyList, selectedCompany }, { merge: true });
             } catch (err) {
                 console.error("Failed to save company settings to cloud", err);
@@ -554,7 +554,7 @@
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('dateInput').value = today;
                 document.getElementById('filterDate').value = today;
-                await fetchCompanySettingsFromCloud(); // โหลดการตั้งค่าบริษัทจาก Cloud ทันทีที่เชื่อมต่อสำเร็จ
+                await fetchCompanySettingsFromCloud(); // โหลดการตั้งค่าบริษัทจาก Cloud เมื่อเชื่อมต่อสำเร็จ
                 fetchData();
             }
         });
@@ -804,7 +804,7 @@
 
         async function openDailySummary() {
             currentReportMode = 'standard';
-            await fetchCompanySettingsFromCloud(); // อัปเดตข้อมูลบริษัทล่าสุดจาก Cloud ก่อนเปิด Modal
+            await fetchCompanySettingsFromCloud(); // ดึงข้อมูลบริษัทล่าสุดจาก Cloud ก่อนแสดงผล
             const fDate = document.getElementById('filterDate').value;
             let dData = fDate ? allEntries.filter(item => item.rawDate === fDate) : [...allEntries];
             populateModal(dData, fDate ? `สรุปรายการวันที่: ${new Date(fDate).toLocaleDateString('th-TH')}` : "สรุปรายการทั้งหมด");
